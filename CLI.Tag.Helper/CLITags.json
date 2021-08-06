@@ -1,0 +1,48 @@
+[
+  {
+    "Culture": "en-Us",
+    "Tags": [
+      {
+        "Names": [
+          "he",
+          "help"
+        ],
+        "Description": "Displays help information about the program",
+        "Comment": "Help information"
+
+      },
+      {
+        "Names": [
+          "l",
+          "lang",
+          "language"
+        ],
+        "Description": "Sets the language for programs",
+        "Comment": "(--lang en-Us | --lang ru-RU)"
+      }
+    ]
+  },
+  {
+    "Culture": "ru-Ru",
+    "Tags": [
+      {
+        "Names": [
+          "h",
+          "help"
+        ],
+        "Description": "Выводит справочную информацию по командам командной строки",
+        "Comment": "Справочная информация"
+
+      },
+      {
+        "Names": [
+          "l",
+          "lang",
+          "language"
+        ],
+        "Description": "Устанавливает язык для программы",
+        "Comment": "(--lang en-Us | --lang ru-RU)"
+      }
+    ]
+  }
+]

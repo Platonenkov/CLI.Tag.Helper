@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "SampleCLI": {
+      "commandName": "Project",
+      "commandLineArgs": "-h"
+    }
+  }
+}
