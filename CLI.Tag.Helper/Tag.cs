@@ -10,6 +10,7 @@ namespace CLI.Tag.Helper
 
         /// <summary> Список тегов выполняющих одну функцию </summary>
         public IEnumerable<string> Names { get; init; }
+
         /// <summary> описание действий тега </summary>
         public string Description { get; init; }
         /// <summary> комментарий к тегу </summary>
@@ -17,6 +18,8 @@ namespace CLI.Tag.Helper
 
         #endregion
 
+        /// <returns>перечисление тегов с приставкой дефиса или дефисов в зависимости от длинны тега</returns>
+        public IEnumerable<string> FullNames => Names.Select(GetFullTag);
 
         /// <summary>
         /// получает тег с приставкой дефиса или дефисов в зависимости от длинны тега
@@ -39,6 +42,20 @@ namespace CLI.Tag.Helper
                 : $"\n{Comment}")
             + Environment.NewLine;
 
+        /// <summary> Выводит информацию о теге на консоль </summary>
+        public void ConsolePrint()
+        {
+            var names = Names.Aggregate(
+                string.Empty,
+                (
+                    current,
+                    tag) => current + $"\n{GetFullTag(tag),-20}");
+
+            names.ConsoleGreen(string.IsNullOrWhiteSpace(Description));
+            Description?.ConsoleGreen(true);
+            Comment.ConsoleYellow(true);
+            Console.WriteLine();
+        }
         #endregion
 
     }

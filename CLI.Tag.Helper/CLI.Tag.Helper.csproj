@@ -3,6 +3,19 @@
   <PropertyGroup>
     <TargetFrameworks>netstandard2.0;netcoreapp3.1;net5.0</TargetFrameworks>
     <LangVersion>latest</LangVersion>
+    <Authors>Platonenkov</Authors>
+    <Company>https://github.com/Platonenkov</Company>
+    <Copyright>https://github.com/Platonenkov</Copyright>
+    <Description>Хранение и отображение информации о командах инструмента командной строки, с локализацией;
+Storaging and displaing of information on commands of the tool of a command line, with localization</Description>
+    <PackageReleaseNotes>Хранение и отображение информации о командах инструмента командной строки, с локализацией;
+Storaging and displaing of information on commands of the tool of a command line, with localization</PackageReleaseNotes>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageIcon>icon.png</PackageIcon>
+    <PackageIconUrl />
+    <RepositoryUrl>https://github.com/Platonenkov/CLI.Tag.Helper</RepositoryUrl>
+    <RepositoryType>GitHub</RepositoryType>
+    <PackageTags>CLI tag help</PackageTags>
   </PropertyGroup>
 
   <ItemGroup>
@@ -16,6 +29,10 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\Resources\icon.png">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
     <None Include="CLI.Tag.Helper.targets">
       <PackagePath>build\</PackagePath>
       <Pack>true</Pack>

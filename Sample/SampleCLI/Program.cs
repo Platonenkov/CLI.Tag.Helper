@@ -1,9 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Globalization;
-using System.IO;
 using System.Linq;
-using System.Text.Json;
 using System.Threading.Tasks;
 using CLI.Tag.Helper;
 
@@ -25,10 +22,8 @@ namespace SampleCLI
                             if (lang_arg is not null && args.FirstIndexOf(lang_arg) is var lang_index)
                                 SetLanguage(lang_index);
 
-                            var help_tags = await CLITagHelper.GetLocalizedTagsAsync(CurrentCulture);
-
-                            foreach (var tag in help_tags.Tags)
-                                Console.WriteLine(tag);
+                            await CLITagHelper.PrintSupportedLanguagesAsync();
+                            await CLITagHelper.WriteHelpInfo(CurrentCulture);
                             return 1;
                         }
                     case "-l":
