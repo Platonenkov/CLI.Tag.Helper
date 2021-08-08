@@ -4,7 +4,7 @@
 
 ## Quick start
 
-### Install-Package CLI.Tag.Helper -Version 1.0.0.0
+### Install-Package CLI.Tag.Helper -Version 1.0.0.1
 
 Open or Create File `CLITags.json`
 
