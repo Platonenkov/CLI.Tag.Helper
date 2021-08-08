@@ -16,14 +16,18 @@ Storaging and displaing of information on commands of the tool of a command line
     <RepositoryUrl>https://github.com/Platonenkov/CLI.Tag.Helper</RepositoryUrl>
     <RepositoryType>GitHub</RepositoryType>
     <PackageTags>CLI tag help</PackageTags>
+    <Version>1.0.0.1</Version>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="System.Text.Json" Version="5.0.2" />
   </ItemGroup>
   <ItemGroup>
+    <None Remove="CLITags.json" />
+  </ItemGroup>
+  <ItemGroup>
     <Content Include="CLITags.json">
-      <PackagePath>Databases</PackagePath>
+      <PackagePath></PackagePath>
       <Pack>True</Pack>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
