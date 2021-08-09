@@ -1,14 +1,3 @@
-## CLI.Tag.Helper
-
-![Demo](https://github.com/Platonenkov/CLI.Tag.Helper/blob/master/Resources/cli_help.gif)
-
-## Quick start
-
-### Install-Package CLI.Tag.Helper -Version 1.0.1
-
-Open or Create File {PROJECT_NAME}.Tags.json, or input other to the constructor
-
-```json
 [
   {
     "Culture": "en-Us",
@@ -56,16 +45,4 @@ Open or Create File {PROJECT_NAME}.Tags.json, or input other to the constructor
       }
     ]
   }
-
-```
-
-`Edit language and tags` what you need.
-
-### Use in you programm:
-
-```C#
-await CLITagHelper.PrintSupportedLanguagesAsync();
-await CLITagHelper.WriteHelpInfo("en"); //en-Us, en, En - what culture you need
-```
-
-### [Sample](https://gist.github.com/Platonenkov/a82bb929a7bf0381f24c86c852dab8aa)
+]
