@@ -11,12 +11,17 @@ namespace CLI.Tag.Helper
     public class CLITagHelper
     {
         #region Static Extensions
-
-        public static async Task WriteHelpInfo(CultureInfo culture)
+        /// <summary>
+        /// Вывод на консоль доступных команд CLI
+        /// </summary>
+        /// <param name="culture">язык для вывода</param>
+        /// <param name="TagFilePath">путь к файлу тегов (если Null - используется PROJECT_NAME.Tags.json)</param>
+        /// <returns></returns>
+        public static async Task WriteHelpInfo(CultureInfo culture, string TagFilePath = null)
         {
-            var help_tags = await GetLocalizedTagsAsync(culture);
+            var help_tags = await GetLocalizedTagsAsync(culture, TagFilePath);
 
-            if (help_tags is null || help_tags.Tags is null)
+            if (help_tags?.Tags is null)
             {
                 "The program has no reference information".ConsoleRed();
                 return;
@@ -27,58 +32,70 @@ namespace CLI.Tag.Helper
         }
         /// <summary> Получить список локализованных тегов </summary>
         /// <param name="culture">культура языка</param>
+        /// <param name="TagFilePath">путь к файлу тегов (если Null - используется PROJECT_NAME.Tags.json)</param>
         /// <returns></returns>
-        public static async Task<LocalizedTags> GetLocalizedTagsAsync(CultureInfo culture) =>
+        public static async Task<LocalizedTags> GetLocalizedTagsAsync(CultureInfo culture, string TagFilePath = null) =>
             await Task.Run(() => GetLocalizedTags(culture)).ConfigureAwait(false);
 
         /// <summary> Получить список локализованных тегов </summary>
         /// <param name="culture">культура языка</param>
+        /// <param name="TagFilePath">путь к файлу тегов (если Null - используется PROJECT_NAME.Tags.json)</param>
         /// <returns></returns>
-        public static LocalizedTags GetLocalizedTags(CultureInfo culture)
+        public static LocalizedTags GetLocalizedTags(CultureInfo culture, string TagFilePath = null)
         {
-            var cli = new CLITagHelper(culture);
+            var cli = new CLITagHelper(culture, TagFilePath);
             return cli.CurrentCultureTags;
         }
         /// <summary> Перечисление поддерживаемых локализаций </summary>
-        public static async Task<IEnumerable<string>> GetSupportedLanguagesAsync() => 
-            await Task.Run(GetSupportedLanguages).ConfigureAwait(false);
+        /// <param name="TagFilePath">путь к файлу тегов (если Null - используется PROJECT_NAME.Tags.json)</param>
+        public static async Task<IEnumerable<string>> GetSupportedLanguagesAsync(string TagFilePath = null) =>
+            await Task.Run(()=>GetSupportedLanguages(TagFilePath)).ConfigureAwait(false);
         /// <summary> Перечисление поддерживаемых локализаций </summary>
-        public static IEnumerable<string> GetSupportedLanguages()
+        /// <param name="TagFilePath">путь к файлу тегов (если Null - используется PROJECT_NAME.Tags.json)</param>
+        public static IEnumerable<string> GetSupportedLanguages(string TagFilePath = null)
         {
-            var cli = new CLITagHelper((CultureInfo) null);
+            var cli = new CLITagHelper((CultureInfo)null, TagFilePath);
             return cli.SupportedCultures;
         }
-
-        public static async Task PrintSupportedLanguagesAsync()
+        /// <summary> Вывод на консоль поддерживаемых языков тегов </summary>
+        /// <param name="TagFilePath">путь к файлу тегов (если Null - используется PROJECT_NAME.Tags.json)</param>
+        public static async Task PrintSupportedLanguagesAsync(string TagFilePath = null)
         {
-            var languages = (await CLITagHelper.GetSupportedLanguagesAsync()).ToArray();
+            var languages = (await CLITagHelper.GetSupportedLanguagesAsync(TagFilePath)).ToArray();
             if (languages.Length > 0)
-                $"Supported languages: {string.Join(", ", languages)}".ConsoleGreen();
+                $"Supported languages: {string.Join(", ", languages)}".ConsoleYellow();
         }
-        public static void PrintSupportedLanguages()
+        /// <summary> Вывод на консоль поддерживаемых языков тегов </summary>
+        /// <param name="TagFilePath">путь к файлу тегов (если Null - используется PROJECT_NAME.Tags.json)</param>
+        public static void PrintSupportedLanguages(string TagFilePath = null)
         {
-            var languages = CLITagHelper.GetSupportedLanguages().ToArray();
+            var languages = CLITagHelper.GetSupportedLanguages(TagFilePath).ToArray();
             if (languages.Length > 0)
                 $"Supported languages: {string.Join(", ", languages)}".ConsoleGreen();
         }
 
         #endregion
 
+        /// <summary> конструктор </summary>
+        /// <param name="culture">культура для поиска тегов</param>
+        /// <param name="TagFilePath">путь к файлу тегов (если Null - используется PROJECT_NAME.Tags.json)</param>
+        public CLITagHelper(CultureInfo culture, string TagFilePath = null) => Initialize(culture?.Name, TagFilePath);
+        /// <summary> конструктор </summary>
+        /// <param name="locale">название языка для поиска тегов</param>
+        /// <param name="TagFilePath">путь к файлу тегов (если Null - используется PROJECT_NAME.Tags.json)</param>
+        public CLITagHelper(string locale, string TagFilePath = null) => Initialize(locale, TagFilePath);
 
-        public CLITagHelper(CultureInfo culture) => Initialize(culture?.Name);
-
-        public CLITagHelper(string locale) => Initialize(locale);
-
-        private void Initialize(string locale)
+        private void Initialize(string locale, string TagFilePath)
         {
-            GetLocalizedTags();
+            GetLocalizedTags(TagFilePath);
             CurrentCulture = locale;
         }
         /// <summary> Перечисление локализованных тегов CLI </summary>
         public IReadOnlyCollection<LocalizedTags> LocalizedTags { get; private set; }
         /// <summary> Текущий язык или культура </summary>
         public string CurrentCulture { get; private set; }
-
+        /// <summary> Устанавливает язык для получения локализованных тегов </summary>
+        /// <param name="culture"></param>
         public void SetCulture(CultureInfo culture) => CurrentCulture = culture.Name;
         /// <summary> текущая локализация тегов </summary>
         public LocalizedTags CurrentCultureTags
@@ -87,11 +104,11 @@ namespace CLI.Tag.Helper
             {
                 var tags = LocalizedTags;
                 var current_culture = CurrentCulture.ToUpper();
-                if (string.IsNullOrWhiteSpace(current_culture)) 
+                if (string.IsNullOrWhiteSpace(current_culture))
                     return tags.FirstOrDefault();
 
                 var current = tags.FirstOrDefault(
-                    t => t.Culture?.ToUpper() is {Length:>0} current_tag
+                    t => t.Culture?.ToUpper() is { Length: > 0 } current_tag
                          &&
                          (current_tag == current_culture ||
                           current_tag.Split('-')[0] == current_culture ||
@@ -103,12 +120,13 @@ namespace CLI.Tag.Helper
         #region Get Tags
 
         /// <summary> Путь к файлу с тегами </summary>
-        private static string TagHelpFilePath => Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "CLITags.json");
+        private static string TagHelpFilePath => Path.Combine(AppDomain.CurrentDomain.BaseDirectory, $"{AppDomain.CurrentDomain.FriendlyName}.Tags.json");
         /// <summary> Получает перечисление известных тегов с описанием из файла </summary>
+        /// <param name="TagFilePath">путь к файлу тегов (если Null - используется PROJECT_NAME.Tags.json)</param>
         /// <returns>перечисление тегов с описанием</returns>
-        public void GetLocalizedTags()
+        public void GetLocalizedTags(string TagFilePath = null)
         {
-            var file_path = TagHelpFilePath;
+            var file_path = TagFilePath ?? TagHelpFilePath;
             var file = new FileInfo(file_path);
             if (!file.Exists) return;
             var json_file = File.ReadAllText(file_path);

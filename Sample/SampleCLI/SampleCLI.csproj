@@ -6,6 +6,18 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="SampleCLI.Tags.json" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="SampleCLI.Tags.json">
+      <PackagePath></PackagePath>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Pack>True</Pack>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\..\CLI.Tag.Helper\CLI.Tag.Helper.csproj" />
   </ItemGroup>
 
