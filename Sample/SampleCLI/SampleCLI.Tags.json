@@ -8,7 +8,9 @@
           "help"
         ],
         "Description": "Displays help information about the program",
-        "Comment": "Help information"
+        "Comments": [
+          "Help information"
+        ]
 
       },
       {
@@ -18,7 +20,9 @@
           "language"
         ],
         "Description": "Sets the language for programs",
-        "Comment": "(--lang en-Us | --lang ru-RU)"
+        "Comments": [
+          "(--lang en-Us | --lang ru-RU)"
+        ]
       }
     ]
   },
@@ -31,7 +35,9 @@
           "help"
         ],
         "Description": "Выводит справочную информацию по командам командной строки",
-        "Comment": "Справочная информация"
+        "Comments": [
+          "Справочная информация"
+        ]
 
       },
       {
@@ -41,7 +47,9 @@
           "language"
         ],
         "Description": "Устанавливает язык для программы",
-        "Comment": "(--lang en-Us | --lang ru-RU)"
+        "Comments": [
+          "(--lang en-Us | --lang ru-RU)"
+        ]
       }
     ]
   }
