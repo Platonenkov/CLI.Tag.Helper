@@ -4,7 +4,7 @@
 
 ## Quick start
 
-### Install-Package CLI.Tag.Helper -Version 1.0.1
+### Install-Package CLI.Tag.Helper -Version 1.0.1.1
 
 Open or Create File {PROJECT_NAME}.Tags.json, or input other to the constructor
 
@@ -65,7 +65,7 @@ Open or Create File {PROJECT_NAME}.Tags.json, or input other to the constructor
 
 ```C#
 await CLITagHelper.PrintSupportedLanguagesAsync();
-await CLITagHelper.WriteHelpInfo("en"); //en-Us, en, En - what culture you need
+await CLITagHelper.WriteHelpInfo("en"); //en-Us, en, En - what lang or culture Name you need
 ```
 
 ### [Sample](https://gist.github.com/Platonenkov/a82bb929a7bf0381f24c86c852dab8aa)
