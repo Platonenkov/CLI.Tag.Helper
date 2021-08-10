@@ -39,8 +39,7 @@ namespace CLI.Tag.Helper
             + Description
             + (string.IsNullOrWhiteSpace(Comment)
                 ? null
-                : $"\n{Comment}")
-            + Environment.NewLine;
+                : $"\n{Comment}");
 
         /// <summary> Выводит информацию о теге на консоль </summary>
         public void ConsolePrint()
