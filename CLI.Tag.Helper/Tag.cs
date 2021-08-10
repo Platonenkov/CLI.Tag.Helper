@@ -54,7 +54,6 @@ namespace CLI.Tag.Helper
             names.ConsoleGreen(string.IsNullOrWhiteSpace(Description));
             Description?.ConsoleGreen(true);
             Comment.ConsoleYellow(true);
-            Console.WriteLine();
         }
         #endregion
 
