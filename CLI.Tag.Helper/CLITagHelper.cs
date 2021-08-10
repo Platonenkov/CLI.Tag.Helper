@@ -14,12 +14,12 @@ namespace CLI.Tag.Helper
         /// <summary>
         /// Вывод на консоль доступных команд CLI
         /// </summary>
-        /// <param name="culture">язык для вывода</param>
+        /// <param name="lang">язык для вывода</param>
         /// <param name="TagFilePath">путь к файлу тегов (если Null - используется PROJECT_NAME.Tags.json)</param>
         /// <returns></returns>
-        public static async Task WriteHelpInfo(CultureInfo culture, string TagFilePath = null)
+        public static async Task WriteHelpInfo(string lang, string TagFilePath = null)
         {
-            var help_tags = await GetLocalizedTagsAsync(culture, TagFilePath);
+            var help_tags = await GetLocalizedTagsAsync(lang, TagFilePath);
 
             if (help_tags?.Tags is null)
             {
@@ -31,19 +31,19 @@ namespace CLI.Tag.Helper
                 tag.ConsolePrint();
         }
         /// <summary> Получить список локализованных тегов </summary>
-        /// <param name="culture">культура языка</param>
+        /// <param name="lang">культура языка</param>
         /// <param name="TagFilePath">путь к файлу тегов (если Null - используется PROJECT_NAME.Tags.json)</param>
         /// <returns></returns>
-        public static async Task<LocalizedTags> GetLocalizedTagsAsync(CultureInfo culture, string TagFilePath = null) =>
-            await Task.Run(() => GetLocalizedTags(culture)).ConfigureAwait(false);
+        public static async Task<LocalizedTags> GetLocalizedTagsAsync(string lang, string TagFilePath = null) =>
+            await Task.Run(() => GetLocalizedTags(lang,TagFilePath)).ConfigureAwait(false);
 
         /// <summary> Получить список локализованных тегов </summary>
-        /// <param name="culture">культура языка</param>
+        /// <param name="lang">культура языка</param>
         /// <param name="TagFilePath">путь к файлу тегов (если Null - используется PROJECT_NAME.Tags.json)</param>
         /// <returns></returns>
-        public static LocalizedTags GetLocalizedTags(CultureInfo culture, string TagFilePath = null)
+        public static LocalizedTags GetLocalizedTags(string lang, string TagFilePath)
         {
-            var cli = new CLITagHelper(culture, TagFilePath);
+            var cli = new CLITagHelper(lang, TagFilePath);
             return cli.CurrentCultureTags;
         }
         /// <summary> Перечисление поддерживаемых локализаций </summary>
