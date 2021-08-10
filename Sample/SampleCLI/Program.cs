@@ -19,11 +19,12 @@ namespace SampleCLI
                     case "--help":
                         {
                             var lang_arg = args.FirstOrDefault(a => a is "-l" or "--lang" or "--language");
+                            string lang = null;
                             if (lang_arg is not null && args.FirstIndexOf(lang_arg) is var lang_index)
-                                SetLanguage(lang_index);
+                                lang = SetLanguage(lang_index);
 
                             await CLITagHelper.PrintSupportedLanguagesAsync();
-                            await CLITagHelper.WriteHelpInfo(CurrentCulture.Name);
+                            await CLITagHelper.WriteHelpInfo(lang);
                             return 1;
                         }
                     case "-l":
@@ -41,13 +42,14 @@ namespace SampleCLI
 
 
 
-            void SetLanguage(int lang_index)
+            string SetLanguage(int lang_index)
             {
                 if (lang_index == count - 1)
                     throw new ArgumentException($"Key {args[lang_index]} defined, but parameter is not defined.");
 
                 var lang = args[lang_index + 1];
                 CurrentCulture = CultureInfo.GetCultureInfo(lang);
+                return lang;
             }
         }
 

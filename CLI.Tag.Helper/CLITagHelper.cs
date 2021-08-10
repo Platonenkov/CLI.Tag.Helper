@@ -103,7 +103,7 @@ namespace CLI.Tag.Helper
             get
             {
                 var tags = LocalizedTags;
-                var current_culture = CurrentCulture.ToUpper();
+                var current_culture = CurrentCulture?.ToUpper();
                 if (string.IsNullOrWhiteSpace(current_culture))
                     return tags.FirstOrDefault();
 
