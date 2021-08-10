@@ -4,7 +4,7 @@
 
 ## Quick start
 
-### Install-Package CLI.Tag.Helper -Version 1.0.1.2
+### Install-Package CLI.Tag.Helper -Version 1.0.2
 
 Open or Create File {PROJECT_NAME}.Tags.json, or input other to the constructor
 
@@ -19,7 +19,9 @@ Open or Create File {PROJECT_NAME}.Tags.json, or input other to the constructor
           "help"
         ],
         "Description": "Displays help information about the program",
-        "Comment": "Help information"
+        "Comments": [
+        "Help information"
+        ]
 
       },
       {
@@ -29,7 +31,9 @@ Open or Create File {PROJECT_NAME}.Tags.json, or input other to the constructor
           "language"
         ],
         "Description": "Sets the language for programs",
-        "Comment": "(--lang en-Us | --lang ru-RU)"
+        "Comments": [
+        "(--lang en-Us | --lang ru-RU)"
+        ]
       }
     ]
   },
@@ -42,7 +46,9 @@ Open or Create File {PROJECT_NAME}.Tags.json, or input other to the constructor
           "help"
         ],
         "Description": "Выводит справочную информацию по командам командной строки",
-        "Comment": "Справочная информация"
+        "Comments": [
+        "Справочная информация"
+        ]
 
       },
       {
@@ -52,7 +58,9 @@ Open or Create File {PROJECT_NAME}.Tags.json, or input other to the constructor
           "language"
         ],
         "Description": "Устанавливает язык для программы",
-        "Comment": "(--lang en-Us | --lang ru-RU)"
+        "Comments": [
+        "(--lang en-Us | --lang ru-RU)"
+        ]
       }
     ]
   }

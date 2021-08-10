@@ -13,8 +13,8 @@ namespace CLI.Tag.Helper
 
         /// <summary> описание действий тега </summary>
         public string Description { get; init; }
-        /// <summary> комментарий к тегу </summary>
-        public string Comment { get; init; }
+        /// <summary> комментарии к тегу </summary>
+        public IEnumerable<string> Comments { get; init; }
 
         #endregion
 
@@ -37,10 +37,13 @@ namespace CLI.Tag.Helper
                     current,
                     tag) => current + $"\n{GetFullTag(tag),-20}")
             + Description
-            + (string.IsNullOrWhiteSpace(Comment)
+            + (string.IsNullOrWhiteSpace(CommentsToString())
                 ? null
-                : $"\n{Comment}");
+                : $"\n{CommentsToString()}");
 
+        /// <summary> Строковое составное значение комментариев </summary>
+        /// <returns></returns>
+        private string CommentsToString() => Comments is null ? null : string.Join("\n", Comments);
         /// <summary> Выводит информацию о теге на консоль </summary>
         public void ConsolePrint()
         {
@@ -51,8 +54,10 @@ namespace CLI.Tag.Helper
                     tag) => current + $"\n{GetFullTag(tag),-20}");
 
             names.ConsoleGreen(string.IsNullOrWhiteSpace(Description));
-            Description?.ConsoleGreen(true);
-            Comment.ConsoleYellow(true);
+            if (!string.IsNullOrWhiteSpace(Description))
+                Description.ConsoleGreen();
+            if (CommentsToString() is {Length:>0} comments)
+                comments.ConsoleYellow();
         }
         #endregion
 
