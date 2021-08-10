@@ -23,7 +23,7 @@ namespace SampleCLI
                                 SetLanguage(lang_index);
 
                             await CLITagHelper.PrintSupportedLanguagesAsync();
-                            await CLITagHelper.WriteHelpInfo(CurrentCulture);
+                            await CLITagHelper.WriteHelpInfo(CurrentCulture.Name);
                             return 1;
                         }
                     case "-l":
