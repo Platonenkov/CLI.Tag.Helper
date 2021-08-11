@@ -8,15 +8,15 @@
     <Copyright>https://github.com/Platonenkov</Copyright>
     <Description>Хранение и отображение информации о командах инструмента командной строки, с локализацией; Создайте файл {PROJECT_NAME}.Tags.json;
 Storaging and displaing of information on commands of the tool of a command line, with localization; Create file {PROJECT_NAME}.Tags.json</Description>
-    <PackageReleaseNotes>Добавлена возможность множественных комментариев
-Added the possibility of multiple comments</PackageReleaseNotes>
+    <PackageReleaseNotes>Добавлена возможность поиска по тегам
+Added the possibility of find tag</PackageReleaseNotes>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageIcon>icon.png</PackageIcon>
     <PackageIconUrl />
     <RepositoryUrl>https://github.com/Platonenkov/CLI.Tag.Helper</RepositoryUrl>
     <RepositoryType>GitHub</RepositoryType>
     <PackageTags>CLI tag help</PackageTags>
-    <Version>1.0.2</Version>
+    <Version>1.0.3</Version>
     <PackageProjectUrl>https://github.com/Platonenkov/CLI.Tag.Helper</PackageProjectUrl>
   </PropertyGroup>
 

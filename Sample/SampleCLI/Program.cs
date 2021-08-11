@@ -24,7 +24,9 @@ namespace SampleCLI
                                 lang = SetLanguage(lang_index);
 
                             await CLITagHelper.PrintSupportedLanguagesAsync();
-                            await CLITagHelper.WriteHelpInfo(lang);
+                            await CLITagHelper.WriteHelpInfoAsync(lang);
+                            await CLITagHelper.WriteTagInfoAsync("b", lang);
+                            await CLITagHelper.WriteTagInfoAsync("h", lang);
                             return 1;
                         }
                     case "-l":

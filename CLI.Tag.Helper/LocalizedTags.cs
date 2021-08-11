@@ -1,15 +1,15 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 
 namespace CLI.Tag.Helper
 {
     public class LocalizedTags
-        //: IEnumerable
     {
         /// <summary> Локализация </summary>
         public string Culture { get; init; }
         /// <summary> Список тегов </summary>
         public IEnumerable<Tag> Tags { get; init; }
 
-        //public IEnumerator GetEnumerator() => Tags.GetEnumerator();
+        public Tag FindTag(string tag) => Tags?.FirstOrDefault(t => t.Names.Contains(tag.TrimStart('-')));
     }
 }
