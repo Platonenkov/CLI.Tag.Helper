@@ -11,6 +11,14 @@ namespace SampleCLI
         public static CultureInfo CurrentCulture = CultureInfo.GetCultureInfo("en-Us");
         static async Task<int> Main(string[] args)
         {
+            await CLITagHelper.PringTagInfoAsync("l", "ru");
+            await CLITagHelper.PringTagInfoAsync("s", "ru");
+            await CLITagHelper.CheckForHelpTagAndPrintAsync(args);
+            Console.WriteLine(CLITagHelper.FindLanguageTagValue(args));
+
+            CLITagHelper.PrintTagHelpInfoAndClose(args, "-s");
+            CLITagHelper.PrintTagHelpInfoAndClose(args, "-l");
+            CLITagHelper.CheckTagValueError(args, "l");
             var count = args.Length;
             foreach (var (arg, index) in args.Select((arg, i) => (arg, i)).Where(a => a.arg.StartsWith("-")))
                 switch (arg)
@@ -24,9 +32,9 @@ namespace SampleCLI
                                 lang = SetLanguage(lang_index);
 
                             await CLITagHelper.PrintSupportedLanguagesAsync();
-                            await CLITagHelper.WriteHelpInfoAsync(lang);
-                            await CLITagHelper.WriteTagInfoAsync("b", lang);
-                            await CLITagHelper.WriteTagInfoAsync("h", lang);
+                            await CLITagHelper.PrintHelpInfoAsync(lang);
+                            await CLITagHelper.PringTagInfoAsync("b", lang);
+                            await CLITagHelper.PringTagInfoAsync("h", lang);
                             return 1;
                         }
                     case "-l":

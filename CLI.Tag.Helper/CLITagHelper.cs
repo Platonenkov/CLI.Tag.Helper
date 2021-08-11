@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
+using CLI.Tag.Helper.Exception;
 
 namespace CLI.Tag.Helper
 {
@@ -18,7 +18,7 @@ namespace CLI.Tag.Helper
         /// <param name="lang">язык для вывода</param>
         /// <param name="TagFilePath">путь к файлу тегов (если Null - используется PROJECT_NAME.Tags.json)</param>
         /// <returns></returns>
-        public static async Task WriteHelpInfoAsync(string lang, string TagFilePath = null)
+        public static async Task PrintHelpInfoAsync(string lang, string TagFilePath = null)
         {
             var help_tags = await GetLocalizedTagsAsync(lang, TagFilePath);
 
@@ -31,13 +31,11 @@ namespace CLI.Tag.Helper
             foreach (var tag in help_tags.Tags)
                 tag.ConsolePrint();
         }
-        /// <summary>
-        /// Вывод на консоль доступных команд CLI
-        /// </summary>
+        /// <summary> Вывод на консоль доступных команд CLI </summary>
         /// <param name="lang">язык для вывода</param>
         /// <param name="TagFilePath">путь к файлу тегов (если Null - используется PROJECT_NAME.Tags.json)</param>
         /// <returns></returns>
-        public static void WriteHelpInfo(string lang, string TagFilePath = null)
+        public static void PrintHelpInfo(string lang, string TagFilePath = null)
         {
             var help_tags = GetLocalizedTags(lang, TagFilePath);
 
@@ -56,13 +54,13 @@ namespace CLI.Tag.Helper
         /// <param name="lang">язык для вывода</param>
         /// <param name="TagFilePath">путь к файлу тегов (если Null - используется PROJECT_NAME.Tags.json)</param>
         /// <returns></returns>
-        public static async Task WriteTagInfoAsync(string tag, string lang, string TagFilePath = null)
+        public static async Task PringTagInfoAsync(string tag, string lang, string TagFilePath = null)
         {
             var help_tags = await GetLocalizedTagsAsync(lang, TagFilePath);
 
             if (help_tags?.FindTag(tag) is not { } find)
             {
-                "UNKNOWN tag".ConsoleRed();
+                $"UNKNOWN tag: {tag}".ConsoleRed();
                 return;
             }
 
@@ -73,7 +71,7 @@ namespace CLI.Tag.Helper
         /// <param name="lang">язык для вывода</param>
         /// <param name="TagFilePath">путь к файлу тегов (если Null - используется PROJECT_NAME.Tags.json)</param>
         /// <returns></returns>
-        public static void WriteTagInfo(string tag, string lang, string TagFilePath = null)
+        public static void PrintTagInfo(string tag, string lang, string TagFilePath = null)
         {
             var help_tags = GetLocalizedTags(lang, TagFilePath);
 
@@ -85,7 +83,7 @@ namespace CLI.Tag.Helper
 
             find.ConsolePrint();
         }
-        /// <summary> Вывод на консоль информации по тегу </summary>
+        /// <summary> Ищет тег в доступных</summary>
         /// <param name="tag">искомый тег</param>
         /// <param name="lang">язык для вывода</param>
         /// <param name="TagFilePath">путь к файлу тегов (если Null - используется PROJECT_NAME.Tags.json)</param>
@@ -95,7 +93,7 @@ namespace CLI.Tag.Helper
             var help_tags = await GetLocalizedTagsAsync(lang, TagFilePath);
             return help_tags?.FindTag(tag);
         }
-        /// <summary> Вывод на консоль информации по тегу </summary>
+        /// <summary> Ищет тег в доступных</summary>
         /// <param name="tag">искомый тег</param>
         /// <param name="lang">язык для вывода</param>
         /// <param name="TagFilePath">путь к файлу тегов (если Null - используется PROJECT_NAME.Tags.json)</param>
@@ -220,11 +218,188 @@ namespace CLI.Tag.Helper
             if (!File.Exists(file_path)) return new List<LocalizedTags>();
             var json_file = File.ReadAllText(file_path);
             return JsonSerializer.Deserialize<IReadOnlyCollection<LocalizedTags>>(json_file);
-        } 
+        }
 
         #endregion
 
         /// <summary> Перечисление поддерживаемых локализаций </summary>
         public IEnumerable<string> SupportedCultures => LocalizedTags.Select(t => t.Culture);
+
+
+        #region Supports
+        /// <summary> Проверка что за тегом следует его аргумент а не другой тег</summary>
+        /// <param name="args">аргументы ком. строки</param>
+        /// <param name="index">текущий индекс тега</param>
+        /// <returns>заданный тегом параметр</returns>
+        public static string CheckValueIndexError(string[] args, int index)
+        {
+            if (index == args.Length - 1 || args[index + 1].StartsWith("-"))
+                throw new CLIHelpConfigurationException($"Key {args[index]} defined, but parameter is not defined.");
+            return args[index + 1];
+        }
+        /// <summary> Проверка что за тегом следует его аргумент а не другой тег</summary>
+        /// <param name="args">аргументы ком. строки</param>
+        /// <param name="tag">текущий тег</param>
+        /// <returns>заданный тегом параметр</returns>
+        public static string CheckTagValueError(string[] args, string tag)
+        {
+            var index = GetTagIndex(args, tag);
+            if (index == -1)
+                throw new CLIHelpConfigurationException($"Key {tag} is not defined.");
+            PrintTagHelpInfoAndClose(args, tag, index);
+
+            return CheckValueIndexError(args, index);
+        }
+        /// <summary>
+        /// Проверяет необходимость вывода help в консоль (если тег -h или --help является первым тегом)
+        /// </summary>
+        /// <param name="args">аргументы ком. строки</param>
+        /// <returns></returns>
+        public static async Task CheckForHelpTagAndPrintAsync(string[] args)
+        {
+            if (args.Length > 0 && args[0] is "-h" or "--help")
+            {
+                var lang = FindLanguageTagValue(args);
+                await PrintSupportedLanguagesAsync();
+                await PrintHelpInfoAsync(lang); //en-Us, en, En - what lang or culture name you need
+                Environment.Exit(1);
+            }
+        }
+        /// <summary>
+        /// Проверяет необходимость вывода help в консоль (если тег -h или --help является первым тегом)
+        /// </summary>
+        /// <param name="args">аргументы ком. строки</param>
+        /// <returns></returns>
+        public static void CheckForHelpTagAndPrint(string[] args)
+        {
+            if (args.Length > 0 && args[0] is "-h" or "--help")
+            {
+                var lang = FindLanguageTagValue(args);
+                PrintSupportedLanguages();
+                PrintHelpInfo(lang); //en-Us, en, En - what lang or culture name you need
+            }
+        }
+        /// <summary>
+        /// Является ли тег идентификатором языка
+        /// </summary>
+        /// <param name="tag">тег</param>
+        /// <returns></returns>
+        public static bool IsItLanguageTag(string tag) => tag.Trim('-') is "l" or "lang" or "language";
+        /// <summary>
+        /// Является ли тег идентификатором языка
+        /// </summary>
+        /// <param name="tag">тег</param>
+        /// <returns></returns>
+        public static bool IsItLanguageTag(char tag) => IsItLanguageTag($"{tag}");
+        /// <summary>
+        /// Является ли тег help
+        /// </summary>
+        /// <param name="tag">тег</param>
+        /// <returns></returns>
+        public static bool IsItHelpTag(string tag) => tag.Trim('-') is "h" or "help";
+        /// <summary>
+        /// Является ли тег help
+        /// </summary>
+        /// <param name="tag">тег</param>
+        /// <returns></returns>
+        public static bool IsItHelpTag(char tag) => IsItHelpTag($"{tag}");
+        /// <summary> Выводит информацию по тегу и закрывает приложение </summary>
+        /// <param name="args">аргументы</param>
+        /// <param name="tag_index">индекс аргумента</param>
+        /// <param name="tag">тег</param>
+        public static void PrintTagHelpInfoAndClose(string[] args, string tag, int tag_index)
+        {
+            var count = args.Length;
+            if (!string.IsNullOrWhiteSpace(tag) && tag_index + 1 < count)
+            {
+                var trimmed_tag = tag.Trim('-');
+                var arg = args[tag_index + 1];
+                if (IsItHelpTag(arg))
+                {
+
+                    var lang = IsItLanguageTag(trimmed_tag) ? null : FindLanguageTagValue(args);
+
+                    var help = new CLITagHelper(lang).CurrentCultureTags?.Tags?.FirstOrDefault(t => t.Names.Contains(trimmed_tag.Trim('-')));
+                    help?.ConsolePrint();
+                    Environment.Exit(1);
+                }
+                else if (IsItLanguageTag(trimmed_tag) && tag_index + 2 < count && IsItHelpTag(args[tag_index+2]))
+                {
+                    PrintHelpAndClose(trimmed_tag, arg);
+                }
+            }
+        }
+        /// <summary>
+        /// Выводит информацию по тегу и останавливает работу программы
+        /// </summary>
+        /// <param name="tag">тег</param>
+        /// <param name="lang">язык</param>
+        public static void PrintHelpAndClose(string tag, string lang)
+        {
+            PrintTagInfo(tag, lang);
+            Environment.Exit(1);
+        }
+        /// <summary>
+        /// Получает индекс тега в списке аргументов
+        /// </summary>
+        /// <param name="args">аргументы</param>
+        /// <param name="tag">тег</param>
+        /// <returns>индекс тега или -1 если отсутствует в списке</returns>
+        public static int GetTagIndex(string[] args, string tag) => args.FirstIndexOf(tag.StartsWith("-") ? tag : Tag.GetFullTag(tag));
+        /// <summary>
+        /// Получает индекс тега в списке аргументов
+        /// </summary>
+        /// <param name="args">аргументы</param>
+        /// <param name="tag">тег</param>
+        /// <returns>индекс тега или -1 если отсутствует в списке</returns>
+        public static int GetTagIndex(string[] args, char tag) => args.FirstIndexOf(Tag.GetFullTag($"{tag}"));
+
+        /// <summary> Выводит информацию по тегу если за ним стоит тег -h или --help и закрывает приложение </summary>
+        /// <param name="args">аргументы</param>
+        /// <param name="tag">тег</param>
+        public static void PrintTagHelpInfoAndClose(string[] args, char tag) => PrintTagHelpInfoAndClose(args, $"{tag}");
+        /// <summary> Выводит информацию по тегу если за ним стоит тег -h или --help и закрывает приложение </summary>
+        /// <param name="args">аргументы</param>
+        /// <param name="tag">тег</param>
+        public static void PrintTagHelpInfoAndClose(string[] args, string tag)
+        {
+            var index = args.FirstIndexOf(tag.StartsWith("-") ? tag : Tag.GetFullTag(tag));
+            if (index == -1 || index + 1 >= args.Length)
+                return;
+
+            if (string.IsNullOrWhiteSpace(tag) || args[index + 1] is not ("-h" or "--help")) return;
+            var lang = FindLanguageTagValue(args);
+
+            var help = new CLITagHelper(lang).CurrentCultureTags?.Tags?.FirstOrDefault(t => t.Names.Contains(tag));
+            help?.ConsolePrint();
+            Environment.Exit(1);
+        }
+        /// <summary> Поиск языка в аргументах </summary>
+        /// <param name="args">аргументы</param>
+        /// <returns>язык</returns>
+        public static string FindLanguageTagValue(string[] args)
+        {
+            var lang_arg = args.FirstOrDefault(a => a is "-l" or "--lang" or "--language");
+            if (lang_arg is not null && args.FirstIndexOf(lang_arg) is var lang_index)
+            {
+                PrintTagHelpInfoAndClose(args, lang_arg, lang_index);
+
+                return GetLanguageValue(args, lang_index);
+            }
+            return null;
+        }
+        /// <summary>
+        /// устанавливает язык контейнера при наличии в аргументах тегов определения языка
+        /// </summary>
+        /// <param name="args">аргументы ком. строки</param>
+        /// <param name="lang_index">индекс языка</param>
+        /// <returns>значение тега языкам</returns>
+        public static string GetLanguageValue(string[] args, int lang_index)
+        {
+            CheckValueIndexError(args, lang_index);
+            return args[lang_index + 1];
+        }
+
+        #endregion
     }
 }

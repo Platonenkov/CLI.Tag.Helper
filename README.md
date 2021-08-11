@@ -4,7 +4,7 @@
 
 ## Quick start
 
-### Install-Package CLI.Tag.Helper -Version 1.0.2
+### Install-Package CLI.Tag.Helper -Version 1.1.0
 
 Open or Create File {PROJECT_NAME}.Tags.json, or input other to the constructor
 
