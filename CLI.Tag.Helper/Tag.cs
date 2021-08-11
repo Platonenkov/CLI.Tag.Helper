@@ -26,7 +26,7 @@ namespace CLI.Tag.Helper
         /// </summary>
         /// <param name="tag">тег</param>
         /// <returns>тег с приставкой дефиса или дефисов в зависимости от длинны тега</returns>
-        private static string GetFullTag(string tag) => tag.Length == 1 ? $"-{tag}" : $"--{tag}";
+        public static string GetFullTag(string tag) => tag.Length == 1 ? $"-{tag}" : $"--{tag}";
 
         #region Overrides of Object
 
