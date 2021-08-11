@@ -250,6 +250,18 @@ namespace CLI.Tag.Helper
 
             return CheckValueIndexError(args, index);
         }
+
+        /// <summary> Проверка что за тегом следует его аргумент а не другой тег</summary>
+        /// <param name="args">аргументы ком. строки</param>
+        /// <param name="tag">текущий тег</param>
+        /// <param name="tag_index">индекс текущего тега</param>
+        /// <returns>заданный тегом параметр</returns>
+        public static string CheckTagValueError(string[] args, string tag, int tag_index)
+        {
+            PrintTagHelpInfoAndClose(args, tag, tag_index);
+
+            return CheckValueIndexError(args, tag_index);
+        }
         /// <summary>
         /// Проверяет необходимость вывода help в консоль (если тег -h или --help является первым тегом)
         /// </summary>
