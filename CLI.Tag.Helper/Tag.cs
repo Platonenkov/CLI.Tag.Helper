@@ -31,11 +31,11 @@ namespace CLI.Tag.Helper
         #region Overrides of Object
 
         public override string ToString() =>
-            Names.Aggregate(
+            FullNames.Aggregate(
                 string.Empty,
                 (
                     current,
-                    tag) => current + $"\n{GetFullTag(tag),-20}")
+                    tag) => current + $"\n{tag,-20}")
             + Description
             + (string.IsNullOrWhiteSpace(CommentsToString())
                 ? null
@@ -47,11 +47,11 @@ namespace CLI.Tag.Helper
         /// <summary> Выводит информацию о теге на консоль </summary>
         public void ConsolePrint()
         {
-            var names = Names.Aggregate(
+            var names = FullNames.Aggregate(
                 string.Empty,
                 (
                     current,
-                    tag) => current + $"\n{GetFullTag(tag),-20}");
+                    tag) => current + $"\n{tag,-20}");
 
             names.ConsoleGreen(string.IsNullOrWhiteSpace(Description));
             if (!string.IsNullOrWhiteSpace(Description))
