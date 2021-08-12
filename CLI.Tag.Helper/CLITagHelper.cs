@@ -7,7 +7,7 @@ using CLI.Tag.Helper.Exception;
 
 namespace CLI.Tag.Helper
 {
-    public static class CliTagHelper
+    public static class CLITagHelper
     {
         #region Arguments value
 
@@ -233,7 +233,7 @@ namespace CLI.Tag.Helper
                 var lang = IsItLanguageTag(tag) ? null : FindLanguageTagValue(args);
 
 
-                var tag_help = new CliTags(lang, TagFilePath).CurrentCultureTags;
+                var tag_help = new CLITags(lang, TagFilePath).CurrentCultureTags;
                 PrintTag(tag_help, tag, true);
             }
             else if (IsItLanguageTag(tag) && tag_index + 2 < count && IsItHelpTag(args[tag_index + 2]))
@@ -293,7 +293,7 @@ namespace CLI.Tag.Helper
         /// <returns></returns>
         public static LocalizedTags GetLocalizedTags(string lang, string TagFilePath)
         {
-            var cli = new CliTags(lang, TagFilePath);
+            var cli = new CLITags(lang, TagFilePath);
             return cli.CurrentCultureTags;
         }
 
@@ -308,7 +308,7 @@ namespace CLI.Tag.Helper
         /// <param name="TagFilePath">путь к файлу тегов (если Null - используется PROJECT_NAME.Tags.json)</param>
         public static IEnumerable<string> GetSupportedLanguages(string TagFilePath = null)
         {
-            var cli = new CliTags((CultureInfo)null, TagFilePath);
+            var cli = new CLITags((CultureInfo)null, TagFilePath);
             return cli.SupportedCultures;
         }
         /// <summary> Вывод на консоль поддерживаемых языков тегов </summary>
