@@ -10,6 +10,6 @@ namespace CLI.Tag.Helper
         /// <summary> Список тегов </summary>
         public IEnumerable<Tag> Tags { get; init; }
 
-        public Tag FindTag(string tag) => tag?.Trim('-') is { Length: > 0 } t ? Tags?.FirstOrDefault(v => v.Names.Contains(t.TrimStart('-'))) : null;
+        public Tag FindTag(string tag) => tag?.Trim('-') is { Length: > 0 } t ? Tags?.FirstOrDefault(v => v.Names.Contains(t)) : null;
     }
 }
