@@ -8,14 +8,14 @@
     <Copyright>https://github.com/Platonenkov</Copyright>
     <Description>Хранение и отображение информации о командах инструмента командной строки, с локализацией; Создайте файл {PROJECT_NAME}.Tags.json;
 Storaging and displaing of information on commands of the tool of a command line, with localization; Create file {PROJECT_NAME}.Tags.json</Description>
-    <PackageReleaseNotes>рефакторинг классов, поддержка проверки, поиска, вывода данных</PackageReleaseNotes>
+    <PackageReleaseNotes>рефакторинг классов, поддержка проверки, поиска, вывода данных, поддержка множественных параметров у тега</PackageReleaseNotes>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageIcon>icon.png</PackageIcon>
     <PackageIconUrl />
     <RepositoryUrl>https://github.com/Platonenkov/CLI.Tag.Helper</RepositoryUrl>
     <RepositoryType>GitHub</RepositoryType>
     <PackageTags>CLI tag help</PackageTags>
-    <Version>1.2.0.2</Version>
+    <Version>1.2.1.0</Version>
     <PackageProjectUrl>https://github.com/Platonenkov/CLI.Tag.Helper</PackageProjectUrl>
   </PropertyGroup>
 

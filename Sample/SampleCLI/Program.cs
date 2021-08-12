@@ -19,7 +19,7 @@ namespace SampleCLI
                     case "-l":
                     case "--lang":
                     case "--language":
-                        {
+                    {
                             var lang = CLITagHelper.GetTagValueOrError(args, tag, index);
                             CurrentCulture = CultureInfo.CreateSpecificCulture(lang);
                             Console.WriteLine($"Culture: {CurrentCulture?.Name}");

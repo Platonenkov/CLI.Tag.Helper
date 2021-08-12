@@ -4,7 +4,7 @@
 
 ## Quick start
 
-### Install-Package CLI.Tag.Helper -Version 1.2.0.2
+### Install-Package CLI.Tag.Helper -Version 1.2.1.0
 
 Open or Create File {PROJECT_NAME}.Tags.json, or input other to the constructor
 
@@ -118,7 +118,7 @@ await CLITagHelper.WriteHelpInfo("en"); //en-Us, en, En - what lang or culture N
 |Methods|Description|Описание|
 |--|-|-|
 |CliTagHelper.`GetTagValueOrError`|Verifying that by the index placed a parameter, but not another tag, and returns its value|Проверка что по индексу лежит есть параметр, но не другой тег, и возвращает его значение |
-|CliTagHelper.`GetIndexValueOrError`|Verifies that the tag is followed by its argument, not another tag, and returns its value|Проверка что за тегом следует его аргумент а не другой тег, и возвращает его значение|
+|CliTagHelper.`GetTagMultipleValueOrError`|Same as GetTagValueOrError but for the tags with multiple parameters|Тоже самое что и GetTagValueOrError только тегов с поддержкой нескольких параметров|
 |CliTagHelper.`IsItHelpTag`|Whether the tag is help tag|Является ли тег тегом справки (help, h)|
 |CliTagHelper.`IsItLanguageTag`|Whether the tag is a language tag|Является ли тег тегом языка|
 |CliTagHelper.`GetTagIndex`|Gets the tag index in the argument list|Получает индекс тега в списке аргументов|
