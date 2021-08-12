@@ -15,11 +15,15 @@ namespace CLI.Tag.Helper
         /// <param name="args">аргументы ком. строки</param>
         /// <param name="index">текущий индекс тега</param>
         /// <param name="ErrorIfNoValue">Обязательно наличие параметра у тега (в случае отсутствия - будет ошибка)</param>
+        /// <param name="ErrorIfMultiple">Воспроизвести ошибку, если у тега несколько параметров</param>
         /// <returns>заданный тегом параметр</returns>
-        public static string GetIndexValueOrError(string[] args, int index, bool ErrorIfNoValue = true)
+        public static string GetIndexValueOrError(string[] args, int index, bool ErrorIfNoValue = true, bool ErrorIfMultiple = true)
         {
             if (index == args.Length - 1 || index < 0 || args[index + 1].StartsWith("-"))
                 return ErrorIfNoValue ? throw new CLIHelpConfigurationException($"Key {args[index]} defined, but parameter is not defined.") : null;
+            if (ErrorIfMultiple)
+                CheckMultipleValueErrorForSingleValueTag(args, args[index], index);
+
             return args[index + 1];
         }
 
@@ -28,17 +32,26 @@ namespace CLI.Tag.Helper
         /// <param name="tag">текущий тег</param>
         /// <param name="tag_index">индекс текущего тега</param>
         /// <param name="ErrorIfNoValue">Обязательно наличие параметра у тега</param>
+        /// <param name="ErrorIfMultiple">Воспроизвести ошибку, если у тега несколько параметров</param>
         /// <returns>заданный тегом параметр</returns>
-        public static string GetTagValueOrError(string[] args, string tag, int tag_index, bool ErrorIfNoValue = true)
+        public static string GetTagValueOrError(string[] args, string tag, int tag_index, bool ErrorIfNoValue = true, bool ErrorIfMultiple = true)
         {
             if (tag_index < 0 || tag_index >= args.Length)
                 return ErrorIfNoValue ? throw new CLIHelpConfigurationException($"Key {tag} is not defined.") : null;
 
             CheckHelpArgAfterTag_PrintAndClose(args, tag, tag_index);
-
-            return GetIndexValueOrError(args, tag_index, ErrorIfNoValue);
+            return GetIndexValueOrError(args, tag_index, ErrorIfNoValue, ErrorIfMultiple);
         }
 
+        private static void CheckMultipleValueErrorForSingleValueTag(string[] args, string tag, int tag_index)
+        {
+            var next = tag_index + 2;
+            if (next < args.Length && !args[next].StartsWith("-"))
+                throw new CLIHelpConfigurationException(
+                    $"Key {tag} defined with multiple parameters, but this tag must defined with single."
+                    + $"\nCheck parameter {args[next]}");
+
+        }
         /// <summary> Проверка что за тегом следует его аргумент а не другой тег</summary>
         /// <param name="args">аргументы ком. строки</param>
         /// <param name="tag">текущий тег</param>
@@ -48,6 +61,46 @@ namespace CLI.Tag.Helper
         {
             var index = GetTagIndex(args, tag);
             return GetTagValueOrError(args, tag, index, ErrorIfNoValue);
+        }
+        /// <summary> Проверка что за тегом следуют его аргументы а не другой тег</summary>
+        /// <param name="args">аргументы ком. строки</param>
+        /// <param name="tag">текущий тег</param>
+        /// <param name="tag_index">индекс текущего тега</param>
+        /// <param name="ErrorIfNoValue">Обязательно наличие параметра у тега</param>
+        /// <returns>заданный тегом параметр</returns>
+        public static IEnumerable<string> GetTagMultipleValueOrError(string[] args, string tag, int tag_index, bool ErrorIfNoValue = true)
+        {
+            if (tag_index < 0 || tag_index >= args.Length)
+                return ErrorIfNoValue ? throw new CLIHelpConfigurationException($"Key {tag} is not defined.") : null;
+
+            CheckHelpArgAfterTag_PrintAndClose(args, tag, tag_index);
+
+            var values = new List<string>();
+
+            var first = GetIndexValueOrError(args, tag_index, ErrorIfNoValue, false);
+            if (first is null)
+                return null;
+
+            values.Add(first);
+            for (var i = tag_index + 2; i < args.Length; i++)
+            {
+                var value = args[i];
+                if (value.StartsWith("-"))
+                    break;
+                values.Add(value);
+            }
+            return values;
+        }
+
+        /// <summary> Проверка что за тегом следуют его аргументы а не другой тег</summary>
+        /// <param name="args">аргументы ком. строки</param>
+        /// <param name="tag">текущий тег</param>
+        /// <param name="ErrorIfNoValue">Обязательно наличие параметра у тега (в случае отсутствия - будет ошибка)</param>
+        /// <returns>заданный тегом параметр</returns>
+        public static IEnumerable<string> GetTagMultipleValueOrError(string[] args, string tag, bool ErrorIfNoValue = true)
+        {
+            var index = GetTagIndex(args, tag);
+            return GetTagMultipleValueOrError(args, tag, index, ErrorIfNoValue);
         }
 
 

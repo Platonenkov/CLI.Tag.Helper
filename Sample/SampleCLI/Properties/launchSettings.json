@@ -2,7 +2,7 @@
   "profiles": {
     "SampleCLI": {
       "commandName": "Project",
-      "commandLineArgs": "-l ru -h"
+      "commandLineArgs": "-l ru en fr -h"
     }
   }
 }
