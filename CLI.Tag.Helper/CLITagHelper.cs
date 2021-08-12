@@ -9,7 +9,66 @@ namespace CLI.Tag.Helper
 {
     public static class CLITagHelper
     {
+        #region Checks
+
+        /// <summary>
+        /// Проверка что после тега есть параметр
+        /// </summary>
+        /// <param name="args">аргументы</param>
+        /// <param name="index">индекс тега</param>
+        /// <returns></returns>
+        public static bool TagHasValue(string[] args, int index) =>
+            !(index == args.Length - 1 || index < 0 || args[index + 1].StartsWith("-"));
+        /// <summary>
+        /// Проверка что после тега есть параметр
+        /// </summary>
+        /// <param name="args">аргументы</param>
+        /// <param name="tag">тег</param>
+        /// <returns></returns>
+        public static bool TagHasValue(string[] args, string tag) => TagHasValue(args, GetTagIndex(args, tag));
+        /// <summary>
+        /// Проверка что после тега есть несколько параметров
+        /// </summary>
+        /// <param name="args">аргументы</param>
+        /// <param name="index">индекс тега</param>
+        /// <returns></returns>
+        public static bool TagHasMultipleValue(string[] args, int index) =>
+            TagHasValue(args, index) && TagHasValue(args, index + 1);
+
+
+        #endregion
+
         #region Arguments value
+        /// <summary>
+        /// Возвращает перечисление аргументов и их позиции индексов в списке аргументов
+        /// </summary>
+        /// <param name="args">список аргументов</param>
+        /// <returns>tag и index</returns>
+        public static IEnumerable<(string tag, int index)> GetArguments(string[] args)
+            => args?.Select((arg, i) => (arg, i)).Where(a => a.arg.StartsWith("-"));
+        /// <summary>
+        /// Возвращает перечисление аргументов и их позиции индексов в списке аргументов
+        /// </summary>
+        /// <param name="args">список аргументов</param>
+        /// <returns>tag, index, parameters</returns>
+        public static IEnumerable<(string tag, int index, IEnumerable<string> parameters)> GetArgumentsWithValues(string[] args)
+            => GetArguments(args)?.Select(a => (a.tag, a.index, GetTagMultipleValueOrError(args, a.tag, a.index, false)));
+        /// <summary>
+        /// Возвращает перечисление аргументов и их позиции индексов в списке аргументов
+        /// </summary>
+        /// <param name="args">список аргументов</param>
+        /// <returns>tag, index, parameters</returns>
+        public static IEnumerable<(string tag, int index, string parameters)> GetArgumentsWithOneStringValues(string[] args)
+            => GetArgumentsWithValues(args)
+               .Select(v => (v.tag, v.index, v.parameters?.ToArray() is { Length: > 0 } values ? string.Join(", ", values) : null));
+
+        /// <summary>
+        /// Проверка что после тега есть несколько параметров
+        /// </summary>
+        /// <param name="args">аргументы</param>
+        /// <param name="tag">тег</param>
+        /// <returns></returns>
+        public static bool TagHasMultipleValue(string[] args, string tag) => TagHasMultipleValue(args, GetTagIndex(args, tag));
 
         /// <summary> Проверка что по индексу лежит есть параметр, но не другой тег, и возвращает его значение </summary>
         /// <param name="args">аргументы ком. строки</param>
@@ -19,7 +78,7 @@ namespace CLI.Tag.Helper
         /// <returns>заданный тегом параметр</returns>
         public static string GetIndexValueOrError(string[] args, int index, bool ErrorIfNoValue = true, bool ErrorIfMultiple = true)
         {
-            if (index == args.Length - 1 || index < 0 || args[index + 1].StartsWith("-"))
+            if (!TagHasValue(args, index))
                 return ErrorIfNoValue ? throw new CLIHelpConfigurationException($"Key {args[index]} defined, but parameter is not defined.") : null;
             if (ErrorIfMultiple)
                 CheckMultipleValueErrorForSingleValueTag(args, args[index], index);

@@ -29,13 +29,12 @@ namespace CLI.Tag.Helper
         public static string GetFullTag(string tag) => tag.Length == 1 ? $"-{tag}" : $"--{tag}";
 
         #region Overrides of Object
-
         public override string ToString() =>
             FullNames.Aggregate(
-                string.Empty,
+                $"{string.Empty,CLIConstants.LeftConsoleMargin}",
                 (
                     current,
-                    tag) => current + $"\n{tag,-20}")
+                    tag) => current + $"\n{string.Empty,CLIConstants.LeftConsoleMargin}{tag,CLIConstants.TagRightMargin}")
             + Description
             + (string.IsNullOrWhiteSpace(CommentsToString())
                 ? null
@@ -48,15 +47,15 @@ namespace CLI.Tag.Helper
         public void ConsolePrint()
         {
             var names = FullNames.Aggregate(
-                string.Empty,
+                $"{string.Empty,CLIConstants.LeftConsoleMargin}",
                 (
                     current,
-                    tag) => current + $"\n{tag,-20}");
+                    tag) => current + $"\n{tag,CLIConstants.TagRightMargin}");
 
             names.ConsoleGreen(string.IsNullOrWhiteSpace(Description));
             if (!string.IsNullOrWhiteSpace(Description))
-                Description.ConsoleGreen();
-            if (CommentsToString() is {Length:>0} comments)
+               $"{Description,CLIConstants.LeftConsoleMargin}".ConsoleGreen();
+            if (CommentsToString() is { Length: > 0 } comments)
                 comments.ConsoleYellow();
         }
         #endregion
