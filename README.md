@@ -125,7 +125,6 @@ await CLITagHelper.WriteHelpInfo("en"); //en-Us, en, En - what lang or culture N
 |CliTagHelper.`PrintHelpInfo`|Output of available CLI commands to the console|Вывод на консоль доступных команд CLI|
 |CliTagHelper.`CheckForHelpTag_PrintAndClose`|Checks whether help should be output to the console (if the -h or --help tag is the first tag)|Проверяет необходимость вывода help в консоль (если тег -h или --help является первым тегом)|
 |CliTagHelper.`PrintTagInfo`|Display the tag information on the console|Вывод на консоль информации по тегу|
-|CliTagHelper.`PrintTagInfoAndClose`|Displays the tag information and closing the program|Выводит информацию по тегу и останавливает работу программы|
 |CliTagHelper.`CheckHelpArgAfterTag_PrintAndClose`|Displays tag information if a -h or --help tag is behind it and closes the application|Выводит информацию по тегу если за ним стоит тег -h или --help и закрывает приложение|
 |CliTagHelper.`FindTag`|Searches for tag in available list|Ищет тег в доступных|
 |CliTagHelper.`GetLocalizedTags`|Get Localized Tags|Получить локализованные теги|
