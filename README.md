@@ -117,7 +117,7 @@ await CLITagHelper.WriteHelpInfo("en"); //en-Us, en, En - what lang or culture N
   
 |Methods|Description|Описание|
 |--|-|-|
-|CliTagHelper.`GetTagValueOrError`|Verifying that by the index placed a parameter, but not another tag, and returns its value|Проверка что по индексу лежит есть параметр, но не другой тег, и возвращает его значение |
+|CliTagHelper.`GetTagValueOrError`|Verifying that by the index placed a parameter, but not another tag, and returns its value|Проверка что по индексу лежит параметр, но не другой тег, и возвращает его значение |
 |CliTagHelper.`GetTagMultipleValueOrError`|Same as GetTagValueOrError but for the tags with multiple parameters|Тоже самое что и GetTagValueOrError только тегов с поддержкой нескольких параметров|
 |CliTagHelper.`IsItHelpTag`|Whether the tag is help tag|Является ли тег тегом справки (help, h)|
 |CliTagHelper.`IsItLanguageTag`|Whether the tag is a language tag|Является ли тег тегом языка|
