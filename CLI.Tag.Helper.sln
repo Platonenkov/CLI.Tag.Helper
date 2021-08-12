@@ -3,11 +3,13 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.31515.178
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CLI.Tag.Helper", "CLI.Tag.Helper\CLI.Tag.Helper.csproj", "{40A9831C-26B1-4D33-8151-72EEDCE874FA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CLI.Tag.Helper", "CLI.Tag.Helper\CLI.Tag.Helper.csproj", "{40A9831C-26B1-4D33-8151-72EEDCE874FA}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Sample", "Sample", "{A0543E33-3CC2-464B-8225-AA9D758FEF94}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SampleCLI", "Sample\SampleCLI\SampleCLI.csproj", "{7BEC74FF-2098-49C4-932C-F50A7DABC68D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SampleCLI", "Sample\SampleCLI\SampleCLI.csproj", "{7BEC74FF-2098-49C4-932C-F50A7DABC68D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TagTableMarkdownSamle", "Sample\TagTableMarkdownSamle\TagTableMarkdownSamle.csproj", "{3A25DAF6-7505-47F7-AB80-AB2CC0349F42}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -23,12 +25,17 @@ Global
 		{7BEC74FF-2098-49C4-932C-F50A7DABC68D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7BEC74FF-2098-49C4-932C-F50A7DABC68D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7BEC74FF-2098-49C4-932C-F50A7DABC68D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3A25DAF6-7505-47F7-AB80-AB2CC0349F42}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3A25DAF6-7505-47F7-AB80-AB2CC0349F42}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3A25DAF6-7505-47F7-AB80-AB2CC0349F42}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3A25DAF6-7505-47F7-AB80-AB2CC0349F42}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{7BEC74FF-2098-49C4-932C-F50A7DABC68D} = {A0543E33-3CC2-464B-8225-AA9D758FEF94}
+		{3A25DAF6-7505-47F7-AB80-AB2CC0349F42} = {A0543E33-3CC2-464B-8225-AA9D758FEF94}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {638EC8B7-24D3-49F6-A10D-71EBE14AF436}
