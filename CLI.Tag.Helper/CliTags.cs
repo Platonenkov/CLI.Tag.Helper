@@ -7,7 +7,7 @@ using System.Text.Json;
 
 namespace CLI.Tag.Helper
 {
-    public class CliTags
+    public class CLITags
     {
 
         #region Конструкторы
@@ -15,11 +15,11 @@ namespace CLI.Tag.Helper
         /// <summary> конструктор </summary>
         /// <param name="culture">культура для поиска тегов</param>
         /// <param name="TagFilePath">путь к файлу тегов (если Null - используется PROJECT_NAME.Tags.json)</param>
-        public CliTags(CultureInfo culture, string TagFilePath = null) => Initialize(culture?.Name, TagFilePath);
+        public CLITags(CultureInfo culture, string TagFilePath = null) => Initialize(culture?.Name, TagFilePath);
         /// <summary> конструктор </summary>
         /// <param name="locale">название языка для поиска тегов</param>
         /// <param name="TagFilePath">путь к файлу тегов (если Null - используется PROJECT_NAME.Tags.json)</param>
-        public CliTags(string locale, string TagFilePath = null) => Initialize(locale, TagFilePath);
+        public CLITags(string locale, string TagFilePath = null) => Initialize(locale, TagFilePath);
 
         private void Initialize(string locale, string TagFilePath)
         {
