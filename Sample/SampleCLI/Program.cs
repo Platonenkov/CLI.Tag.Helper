@@ -29,7 +29,8 @@ namespace SampleCLI
                         {
                             if (tag.StartsWith('-'))
                             {
-                                CliTagHelper.PrintTagInfoAndClose(tag);
+                                var lang = CliTagHelper.FindLanguageTagValue(args);
+                                CliTagHelper.PrintTagInfo(tag, lang);
                                 return -1;
                             }
                             break;
