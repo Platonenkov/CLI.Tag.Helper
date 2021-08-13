@@ -137,8 +137,8 @@ public static void PrintHelp(IEnumerable<Tag> tags)
 |CliTagHelper.`GetArguments`|Get CLI arguments with indexes|Получает перечисление аргументов и индексы их позиций|
 |CliTagHelper.`GetArgumentsWithValues`|Get CLI arguments with values|Получает перечисление аргументов и перечисление их параметров|
 |CliTagHelper.`GetArgumentsWithOneStringValues`|Get CLI arguments with values as one string row|Получает перечисление аргументов и перечисление их параметров - одной строкой|
-|CliTagHelper.PrintArgumentsWithValues|Print incomed arguments with values|Выводит на консоль список входных аргументов CLI (параметры в одну строку через запятую)|
-|CliTagHelper.PrintArgumentsWithValuesMultiParamsRows|Print incomed arguments with values|Выводит на консоль список входных аргументов CLI|
+|CliTagHelper.`PrintArgumentsWithValues`|Print incomed arguments with values|Выводит на консоль список входных аргументов CLI (параметры в одну строку через запятую)|
+|CliTagHelper.`PrintArgumentsWithValuesMultiParamsRows`|Print incomed arguments with values|Выводит на консоль список входных аргументов CLI|
 |CliTagHelper.`GetTagValueOrError`|Verifying that by the index placed a parameter, but not another tag, and returns its value|Проверка что по индексу лежит параметр, но не другой тег, и возвращает его значение |
 |CliTagHelper.`GetTagMultipleValueOrError`|Same as GetTagValueOrError but for the tags with multiple parameters|Тоже самое что и GetTagValueOrError только тегов с поддержкой нескольких параметров|
 |CliTagHelper.`IsItHelpTag`|Whether the tag is help tag|Является ли тег тегом справки (help, h)|
