@@ -14,6 +14,8 @@ namespace CLI.Tag.Helper
         public static Action<IEnumerable<(string tag, int index, string parameters)>> ConsolePrintArgs;
         public static Action<IEnumerable<(string tag, int index, IEnumerable<string> parameters)>> ConsolePrintArgsMulti;
 
+        #region BASE
+
         static CLITagHelper()
         {
             ConsolePrintTags = DefaultPrintHelp;
@@ -59,6 +61,8 @@ namespace CLI.Tag.Helper
                 comments.ConsoleYellow();
 
         }
+
+        #endregion
 
         #region Checks
 
