@@ -13,8 +13,12 @@ namespace SampleCLI
         public static CultureInfo CurrentCulture = CultureInfo.GetCultureInfo("en-Us");
         static async Task<int> Main(string[] args)
         {
-            CLITagHelper.PrintArgumentsWithValues(args, PrintArguments);
-            await CLITagHelper.CheckForHelpTag_PrintAndCloseAsync(args,Action:PrintHelp);
+            CLITagHelper.ConsolePrintTag = PrintTagHelp;
+            CLITagHelper.ConsolePrintTags = PrintHelp;
+            CLITagHelper.ConsolePrintArgs = PrintArguments;
+
+            CLITagHelper.PrintArgumentsWithValues(args);
+            await CLITagHelper.CheckForHelpTag_PrintAndCloseAsync(args);
 
             foreach (var (tag, index) in CLITagHelper.GetArguments(args))
                 switch (tag)
@@ -23,7 +27,7 @@ namespace SampleCLI
                     case "--lang":
                     case "--language":
                         {
-                            var lang = CLITagHelper.GetTagValueOrError(args, tag, index, action:PrintTagHelp);
+                            var lang = CLITagHelper.GetTagValueOrError(args, tag, index);
                             CurrentCulture = CultureInfo.CreateSpecificCulture(lang);
                             Console.WriteLine($"Culture: {CurrentCulture?.Name}");
                             break;
@@ -33,7 +37,7 @@ namespace SampleCLI
                             if (tag.StartsWith('-'))
                             {
                                 var lang = CLITagHelper.FindLanguageTagValue(args);
-                                CLITagHelper.PrintTagInfo(tag, lang, Action:PrintTagHelp);
+                                CLITagHelper.PrintTagInfo(tag, lang);
                                 return -1;
                             }
                             break;

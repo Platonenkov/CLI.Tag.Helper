@@ -12,7 +12,53 @@ namespace CLI.Tag.Helper
         public static Action<IEnumerable<Tag>> ConsolePrintTags;
         public static Action<Tag> ConsolePrintTag;
         public static Action<IEnumerable<(string tag, int index, string parameters)>> ConsolePrintArgs;
-        private static Action<IEnumerable<(string tag, int index, IEnumerable<string> parameters)>> ConsolePrintArgsMulti;
+        public static Action<IEnumerable<(string tag, int index, IEnumerable<string> parameters)>> ConsolePrintArgsMulti;
+
+        static CLITagHelper()
+        {
+            ConsolePrintTags = DefaultPrintHelp;
+            ConsolePrintTag = DefaultPrintTag;
+            ConsolePrintArgs = DefaultPrintArgumentsWithValues;
+            ConsolePrintArgsMulti = DefaultPrintArgumentsWithValues;
+        }
+
+        static void DefaultPrintArgumentsWithValues(IEnumerable<(string tag, int index, IEnumerable<string> parameters)> rows)
+        {
+            foreach ((string tag, int index, IEnumerable<string> parameters) in rows)
+            {
+                if (parameters is null)
+                    $"{index,-2}{tag,-15}".ConsoleYellow();
+                else
+                    $"{index,-2}{tag,-15}{string.Join(", ", parameters)}".ConsoleYellow();
+            }
+        }
+        static void DefaultPrintArgumentsWithValues(IEnumerable<(string tag, int index, string parameters)> rows)
+        {
+            foreach ((string tag, int index, string parameters) in rows)
+            {
+                $"{index,-2}{tag,-15}{parameters}".ConsoleYellow();
+            }
+        }
+        private static void DefaultPrintHelp(IEnumerable<Tag> tags)
+        {
+            foreach (var tag in tags)
+                tag.ConsolePrint();
+        }
+        static void DefaultPrintTag(Tag tag)
+        {
+            var names = tag.FullNames.Aggregate(
+                $"{string.Empty,CLIConstants.LeftConsoleMargin}",
+                (
+                    current,
+                    t) => current + $"\n{t,CLIConstants.TagRightMargin}");
+
+            names.ConsoleGreen(string.IsNullOrWhiteSpace(tag.Description));
+            if (!string.IsNullOrWhiteSpace(tag.Description))
+                $"{tag.Description,CLIConstants.LeftConsoleMargin}".ConsoleGreen();
+            if (tag.CommentsToString() is { Length: > 0 } comments)
+                comments.ConsoleYellow();
+
+        }
 
         #region Checks
 
@@ -46,40 +92,19 @@ namespace CLI.Tag.Helper
         #region Arguments value
         /// <summary> Выводит на консоль список заданных аргументов и параметров </summary>
         /// <param name="args">аргументы CLI</param>
-        /// <param name="action">метод вывода на консоль если нужен свой</param>
-        public static void PrintArgumentsWithValues(string[] args, Action<IEnumerable<(string tag, int index, string parameters)>> action)
+        public static void PrintArgumentsWithValues(string[] args)
         {
             var rows = CLITagHelper.GetArgumentsWithOneStringValues(args).ToArray();
             if (rows.Length <= 0) return;
-            if (action is not null)
-                action.Invoke(rows);
-            else
-            {
-                foreach ((string tag, int index, string parameters) in rows)
-                {
-                    $"{index,-2}{tag,-15}{parameters}".ConsoleYellow();
-                }
-            }
+            ConsolePrintArgs?.Invoke(rows);
         }
         /// <summary> Выводит на консоль список заданных аргументов и параметров </summary>
         /// <param name="args">аргументы CLI</param>
-        /// <param name="action">метод вывода на консоль если нужен свой</param>
-        public static void PrintArgumentsWithValues(string[] args, Action<IEnumerable<(string tag, int index, IEnumerable<string> parameters)>> action)
+        public static void PrintArgumentsWithValuesMultiParamsRows(string[] args)
         {
             var rows = CLITagHelper.GetArgumentsWithValues(args).ToArray();
             if (rows.Length <= 0) return;
-            if (action is not null)
-                action.Invoke(rows);
-            else
-            {
-                foreach ((string tag, int index, IEnumerable<string> parameters) in rows)
-                {
-                    if (parameters is null)
-                        $"{index,-2}{tag,-15}".ConsoleYellow();
-                    else
-                        $"{index,-2}{tag,-15}{string.Join(", ", parameters)}".ConsoleYellow();
-                }
-            }
+            ConsolePrintArgsMulti?.Invoke(rows);
         }
         /// <summary>
         /// Возвращает перечисление аргументов и их позиции индексов в списке аргументов
@@ -134,14 +159,13 @@ namespace CLI.Tag.Helper
         /// <param name="tag_index">индекс текущего тега</param>
         /// <param name="ErrorIfNoValue">Обязательно наличие параметра у тега</param>
         /// <param name="ErrorIfMultiple">Воспроизвести ошибку, если у тега несколько параметров</param>
-        /// <param name="action">метод вывода на консоль если нужен свой</param>
         /// <returns>заданный тегом параметр</returns>
-        public static string GetTagValueOrError(string[] args, string tag, int tag_index, bool ErrorIfNoValue = true, bool ErrorIfMultiple = true, Action<Tag> action = null)
+        public static string GetTagValueOrError(string[] args, string tag, int tag_index, bool ErrorIfNoValue = true, bool ErrorIfMultiple = true)
         {
             if (tag_index < 0 || tag_index >= args.Length)
                 return ErrorIfNoValue ? throw new CLIHelpConfigurationException($"Key {tag} is not defined.") : null;
 
-            CheckHelpArgAfterTag_PrintAndClose(args, tag, tag_index, Action: action);
+            CheckHelpArgAfterTag_PrintAndClose(args, tag, tag_index);
             return GetIndexValueOrError(args, tag_index, ErrorIfNoValue, ErrorIfMultiple);
         }
 
@@ -158,26 +182,24 @@ namespace CLI.Tag.Helper
         /// <param name="args">аргументы ком. строки</param>
         /// <param name="tag">текущий тег</param>
         /// <param name="ErrorIfNoValue">Обязательно наличие параметра у тега (в случае отсутствия - будет ошибка)</param>
-        /// <param name="action">метод вывода на консоль если нужен свой</param>
         /// <returns>заданный тегом параметр</returns>
-        public static string GetTagValueOrError(string[] args, string tag, bool ErrorIfNoValue = true, Action<Tag> action = null)
+        public static string GetTagValueOrError(string[] args, string tag, bool ErrorIfNoValue = true)
         {
             var index = GetTagIndex(args, tag);
-            return GetTagValueOrError(args, tag, index, ErrorIfNoValue, action: action);
+            return GetTagValueOrError(args, tag, index, ErrorIfNoValue);
         }
         /// <summary> Проверка что за тегом следуют его аргументы а не другой тег</summary>
         /// <param name="args">аргументы ком. строки</param>
         /// <param name="tag">текущий тег</param>
         /// <param name="tag_index">индекс текущего тега</param>
         /// <param name="ErrorIfNoValue">Обязательно наличие параметра у тега</param>
-        /// <param name="action">метод вывода на консоль если нужен свой</param>
         /// <returns>заданный тегом параметр</returns>
-        public static IEnumerable<string> GetTagMultipleValueOrError(string[] args, string tag, int tag_index, bool ErrorIfNoValue = true, Action<Tag> action = null)
+        public static IEnumerable<string> GetTagMultipleValueOrError(string[] args, string tag, int tag_index, bool ErrorIfNoValue = true)
         {
             if (tag_index < 0 || tag_index >= args.Length)
                 return ErrorIfNoValue ? throw new CLIHelpConfigurationException($"Key {tag} is not defined.") : null;
 
-            CheckHelpArgAfterTag_PrintAndClose(args, tag, tag_index, Action: action);
+            CheckHelpArgAfterTag_PrintAndClose(args, tag, tag_index);
 
             var values = new List<string>();
 
@@ -200,12 +222,11 @@ namespace CLI.Tag.Helper
         /// <param name="args">аргументы ком. строки</param>
         /// <param name="tag">текущий тег</param>
         /// <param name="ErrorIfNoValue">Обязательно наличие параметра у тега (в случае отсутствия - будет ошибка)</param>
-        /// <param name="action">метод вывода на консоль если нужен свой</param>
         /// <returns>заданный тегом параметр</returns>
-        public static IEnumerable<string> GetTagMultipleValueOrError(string[] args, string tag, bool ErrorIfNoValue = true, Action<Tag> action = null)
+        public static IEnumerable<string> GetTagMultipleValueOrError(string[] args, string tag, bool ErrorIfNoValue = true)
         {
             var index = GetTagIndex(args, tag);
-            return GetTagMultipleValueOrError(args, tag, index, ErrorIfNoValue, action: action);
+            return GetTagMultipleValueOrError(args, tag, index, ErrorIfNoValue);
         }
 
 
@@ -253,28 +274,26 @@ namespace CLI.Tag.Helper
         /// <param name="lang">язык для вывода</param>
         /// <param name="NeedCloseAfterPrint">Закрыть приложение если будет распечатан help</param>
         /// <param name="TagFilePath">путь к файлу тегов (если Null - используется PROJECT_NAME.Tags.json)</param>
-        /// <param name="action">метод вывода на консоль если нужен свой</param>
         /// <returns></returns>
-        public static async Task PrintHelpInfoAsync(string lang, bool NeedCloseAfterPrint, string TagFilePath = null, Action<IEnumerable<Tag>> action = null)
+        public static async Task PrintHelpInfoAsync(string lang, bool NeedCloseAfterPrint, string TagFilePath = null)
         {
             var help_tags = await GetLocalizedTagsAsync(lang, TagFilePath);
 
-            PrintHelp(help_tags, NeedCloseAfterPrint, action);
+            PrintHelp(help_tags, NeedCloseAfterPrint);
         }
         /// <summary> Вывод на консоль доступных команд CLI </summary>
         /// <param name="lang">язык для вывода</param>
         /// <param name="NeedCloseAfterPrint">Закрыть приложение если будет распечатан help</param>
         /// <param name="TagFilePath">путь к файлу тегов (если Null - используется PROJECT_NAME.Tags.json)</param>
-        /// <param name="action">метод вывода на консоль если нужен свой</param>
         /// <returns></returns>
-        public static void PrintHelpInfo(string lang, bool NeedCloseAfterPrint, string TagFilePath = null, Action<IEnumerable<Tag>> action = null)
+        public static void PrintHelpInfo(string lang, bool NeedCloseAfterPrint, string TagFilePath = null)
         {
             var help_tags = GetLocalizedTags(lang, TagFilePath);
 
-            PrintHelp(help_tags, NeedCloseAfterPrint, action);
+            PrintHelp(help_tags, NeedCloseAfterPrint);
         }
 
-        private static void PrintHelp(LocalizedTags help_tags, bool NeedCloseAfterPrint, Action<IEnumerable<Tag>> Action = null)
+        private static void PrintHelp(LocalizedTags help_tags, bool NeedCloseAfterPrint)
         {
             if (help_tags?.Tags is null)
             {
@@ -283,11 +302,8 @@ namespace CLI.Tag.Helper
                     Environment.Exit(1);
                 return;
             }
-            if (Action is not null)
-                Action.Invoke(help_tags.Tags);
-            else
-                foreach (var tag in help_tags.Tags)
-                    tag.ConsolePrint();
+
+            ConsolePrintTags?.Invoke(help_tags.Tags);
 
             if (NeedCloseAfterPrint)
                 Environment.Exit(1);
@@ -299,16 +315,15 @@ namespace CLI.Tag.Helper
         /// <param name="args">аргументы ком. строки</param>
         /// <param name="NeedCloseAfterPrint">Закрыть приложение если будет распечатан help</param>
         /// <param name="TagFilePath">путь к файлу тегов (если Null - используется PROJECT_NAME.Tags.json)</param>
-        /// <param name="Action">метод вывода на консоль если нужен свой</param>
         /// <returns></returns>
-        public static async Task CheckForHelpTag_PrintAndCloseAsync(string[] args, bool NeedCloseAfterPrint = true, string TagFilePath = null, Action<IEnumerable<Tag>> Action = null)
+        public static async Task CheckForHelpTag_PrintAndCloseAsync(string[] args, bool NeedCloseAfterPrint = true, string TagFilePath = null)
         {
             if (args.Length <= 0 || !IsItHelpTag(args[0]))
                 return;
 
             var lang = FindLanguageTagValue(args);
             await PrintSupportedLanguagesAsync(TagFilePath);
-            await PrintHelpInfoAsync(lang, NeedCloseAfterPrint, TagFilePath, Action); //en-Us, en, En - what lang or culture name you need
+            await PrintHelpInfoAsync(lang, NeedCloseAfterPrint, TagFilePath); //en-Us, en, En - what lang or culture name you need
         }
         /// <summary>
         /// Проверяет необходимость вывода help в консоль (если тег -h или --help является первым тегом)
@@ -316,16 +331,15 @@ namespace CLI.Tag.Helper
         /// <param name="args">аргументы ком. строки</param>
         /// <param name="NeedCloseAfterPrint">Закрыть приложение если будет распечатан help</param>
         /// <param name="TagFilePath">путь к файлу тегов (если Null - используется PROJECT_NAME.Tags.json)</param>
-        /// <param name="Action">метод вывода на консоль если нужен свой</param>
         /// <returns></returns>
-        public static void CheckForHelpTag_PrintAndClose(string[] args, bool NeedCloseAfterPrint = true, string TagFilePath = null, Action<IEnumerable<Tag>> Action = null)
+        public static void CheckForHelpTag_PrintAndClose(string[] args, bool NeedCloseAfterPrint = true, string TagFilePath = null)
         {
             if (args.Length <= 0 || !IsItHelpTag(args[0]))
                 return;
 
             var lang = FindLanguageTagValue(args);
             PrintSupportedLanguages(TagFilePath);
-            PrintHelpInfo(lang, NeedCloseAfterPrint, TagFilePath, Action); //en-Us, en, En - what lang or culture name you need
+            PrintHelpInfo(lang, NeedCloseAfterPrint, TagFilePath); //en-Us, en, En - what lang or culture name you need
         }
 
         #endregion
@@ -337,13 +351,12 @@ namespace CLI.Tag.Helper
         /// <param name="lang">язык для вывода</param>
         /// <param name="NeedCloseAfterPrint">Закрыть приложение если будет распечатан help</param>
         /// <param name="TagFilePath">путь к файлу тегов (если Null - используется PROJECT_NAME.Tags.json)</param>
-        /// <param name="Action">метод вывода на консоль если нужен свой</param>
         /// <returns></returns>
-        public static void PrintTagInfo(string tag, string lang = null, bool NeedCloseAfterPrint = true, string TagFilePath = null, Action<Tag> Action = null)
+        public static void PrintTagInfo(string tag, string lang = null, bool NeedCloseAfterPrint = true, string TagFilePath = null)
         {
             var help_tags = GetLocalizedTags(lang, TagFilePath);
 
-            PrintTag(help_tags, tag, NeedCloseAfterPrint, Action);
+            PrintTag(help_tags, tag, NeedCloseAfterPrint);
         }
 
         /// <summary> Вывод на консоль информации по тегу </summary>
@@ -351,16 +364,15 @@ namespace CLI.Tag.Helper
         /// <param name="lang">язык для вывода</param>
         /// <param name="NeedCloseAfterPrint">Закрыть приложение если будет распечатан help</param>
         /// <param name="TagFilePath">путь к файлу тегов (если Null - используется PROJECT_NAME.Tags.json)</param>
-        /// <param name="Action">метод вывода на консоль если нужен свой</param>
         /// <returns></returns>
-        public static async Task PringTagInfoAsync(string tag, string lang, bool NeedCloseAfterPrint = true, string TagFilePath = null, Action<Tag> Action = null)
+        public static async Task PringTagInfoAsync(string tag, string lang, bool NeedCloseAfterPrint = true, string TagFilePath = null)
         {
             var help_tags = await GetLocalizedTagsAsync(lang, TagFilePath);
 
-            PrintTag(help_tags, tag, NeedCloseAfterPrint, Action);
+            PrintTag(help_tags, tag, NeedCloseAfterPrint);
         }
 
-        private static void PrintTag(LocalizedTags help_tags, string tag, bool NeedCloseAfterPrint, Action<Tag> Action)
+        private static void PrintTag(LocalizedTags help_tags, string tag, bool NeedCloseAfterPrint)
         {
             if (help_tags?.FindTag(tag) is not { } find)
             {
@@ -370,7 +382,7 @@ namespace CLI.Tag.Helper
                 return;
             }
 
-            find.ConsolePrint(Action);
+            find.ConsolePrint();
 
             if (NeedCloseAfterPrint)
                 Environment.Exit(1);
@@ -386,8 +398,7 @@ namespace CLI.Tag.Helper
         /// <param name="tag">тег</param>
         /// <param name="tag_index">индекс аргумента</param>
         /// <param name="TagFilePath">путь к файлу тегов (если Null - используется PROJECT_NAME.Tags.json)</param>
-        /// <param name="Action">метод вывода на консоль если нужен свой</param>
-        public static void CheckHelpArgAfterTag_PrintAndClose(string[] args, string tag, int tag_index, string TagFilePath = null, Action<Tag> Action = null)
+        public static void CheckHelpArgAfterTag_PrintAndClose(string[] args, string tag, int tag_index, string TagFilePath = null)
         {
             var count = args.Length;
             if (tag_index < 0 || string.IsNullOrWhiteSpace(tag) || tag_index + 1 >= count)
@@ -401,22 +412,21 @@ namespace CLI.Tag.Helper
 
 
                 var tag_help = new CLITags(lang, TagFilePath).CurrentCultureTags;
-                PrintTag(tag_help, tag, true, Action);
+                PrintTag(tag_help, tag, true);
             }
             else if (IsItLanguageTag(tag) && tag_index + 2 < count && IsItHelpTag(args[tag_index + 2]))
             {
-                PrintTagInfo(tag, arg, true, TagFilePath, Action);
+                PrintTagInfo(tag, arg, true, TagFilePath);
             }
         }
         /// <summary> Выводит информацию по тегу если за ним стоит тег -h или --help и закрывает приложение </summary>
         /// <param name="args">аргументы</param>
         /// <param name="tag">тег</param>
         /// <param name="TagFilePath">путь к файлу тегов (если Null - используется PROJECT_NAME.Tags.json)</param>
-        /// <param name="Action">метод вывода на консоль если нужен свой</param>
-        public static void CheckHelpArgAfterTag_PrintAndClose(string[] args, string tag, string TagFilePath = null, Action<Tag> Action = null)
+        public static void CheckHelpArgAfterTag_PrintAndClose(string[] args, string tag, string TagFilePath = null)
         {
             var index = GetTagIndex(args, tag);
-            CheckHelpArgAfterTag_PrintAndClose(args, tag, index, TagFilePath, Action);
+            CheckHelpArgAfterTag_PrintAndClose(args, tag, index, TagFilePath);
         }
 
         #endregion
