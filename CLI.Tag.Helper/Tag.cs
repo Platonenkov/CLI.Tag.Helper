@@ -42,22 +42,13 @@ namespace CLI.Tag.Helper
 
         /// <summary> Строковое составное значение комментариев </summary>
         /// <returns></returns>
-        private string CommentsToString() => Comments is null ? null : string.Join("\n", Comments);
+        public string CommentsToString() => Comments is null ? null : string.Join("\n", Comments);
         /// <summary> Выводит информацию о теге на консоль </summary>
         public void ConsolePrint()
         {
-            var names = FullNames.Aggregate(
-                $"{string.Empty,CLIConstants.LeftConsoleMargin}",
-                (
-                    current,
-                    tag) => current + $"\n{tag,CLIConstants.TagRightMargin}");
-
-            names.ConsoleGreen(string.IsNullOrWhiteSpace(Description));
-            if (!string.IsNullOrWhiteSpace(Description))
-               $"{Description,CLIConstants.LeftConsoleMargin}".ConsoleGreen();
-            if (CommentsToString() is { Length: > 0 } comments)
-                comments.ConsoleYellow();
+            CLITagHelper.ConsolePrintTag?.Invoke(this);
         }
+
         #endregion
 
     }

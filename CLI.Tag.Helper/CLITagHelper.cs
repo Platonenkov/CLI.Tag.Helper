@@ -9,6 +9,57 @@ namespace CLI.Tag.Helper
 {
     public static class CLITagHelper
     {
+        public static Action<IEnumerable<Tag>> ConsolePrintTags;
+        public static Action<Tag> ConsolePrintTag;
+        public static Action<IEnumerable<(string tag, int index, string parameters)>> ConsolePrintArgs;
+        public static Action<IEnumerable<(string tag, int index, IEnumerable<string> parameters)>> ConsolePrintArgsMulti;
+
+        static CLITagHelper()
+        {
+            ConsolePrintTags = DefaultPrintHelp;
+            ConsolePrintTag = DefaultPrintTag;
+            ConsolePrintArgs = DefaultPrintArgumentsWithValues;
+            ConsolePrintArgsMulti = DefaultPrintArgumentsWithValues;
+        }
+
+        static void DefaultPrintArgumentsWithValues(IEnumerable<(string tag, int index, IEnumerable<string> parameters)> rows)
+        {
+            foreach ((string tag, int index, IEnumerable<string> parameters) in rows)
+            {
+                if (parameters is null)
+                    $"{index,-2}{tag,-15}".ConsoleYellow();
+                else
+                    $"{index,-2}{tag,-15}{string.Join(", ", parameters)}".ConsoleYellow();
+            }
+        }
+        static void DefaultPrintArgumentsWithValues(IEnumerable<(string tag, int index, string parameters)> rows)
+        {
+            foreach ((string tag, int index, string parameters) in rows)
+            {
+                $"{index,-2}{tag,-15}{parameters}".ConsoleYellow();
+            }
+        }
+        private static void DefaultPrintHelp(IEnumerable<Tag> tags)
+        {
+            foreach (var tag in tags)
+                tag.ConsolePrint();
+        }
+        static void DefaultPrintTag(Tag tag)
+        {
+            var names = tag.FullNames.Aggregate(
+                $"{string.Empty,CLIConstants.LeftConsoleMargin}",
+                (
+                    current,
+                    t) => current + $"\n{t,CLIConstants.TagRightMargin}");
+
+            names.ConsoleGreen(string.IsNullOrWhiteSpace(tag.Description));
+            if (!string.IsNullOrWhiteSpace(tag.Description))
+                $"{tag.Description,CLIConstants.LeftConsoleMargin}".ConsoleGreen();
+            if (tag.CommentsToString() is { Length: > 0 } comments)
+                comments.ConsoleYellow();
+
+        }
+
         #region Checks
 
         /// <summary>
@@ -39,6 +90,22 @@ namespace CLI.Tag.Helper
         #endregion
 
         #region Arguments value
+        /// <summary> Выводит на консоль список заданных аргументов и параметров </summary>
+        /// <param name="args">аргументы CLI</param>
+        public static void PrintArgumentsWithValues(string[] args)
+        {
+            var rows = CLITagHelper.GetArgumentsWithOneStringValues(args).ToArray();
+            if (rows.Length <= 0) return;
+            ConsolePrintArgs?.Invoke(rows);
+        }
+        /// <summary> Выводит на консоль список заданных аргументов и параметров </summary>
+        /// <param name="args">аргументы CLI</param>
+        public static void PrintArgumentsWithValuesMultiParamsRows(string[] args)
+        {
+            var rows = CLITagHelper.GetArgumentsWithValues(args).ToArray();
+            if (rows.Length <= 0) return;
+            ConsolePrintArgsMulti?.Invoke(rows);
+        }
         /// <summary>
         /// Возвращает перечисление аргументов и их позиции индексов в списке аргументов
         /// </summary>
@@ -236,8 +303,7 @@ namespace CLI.Tag.Helper
                 return;
             }
 
-            foreach (var tag in help_tags.Tags)
-                tag.ConsolePrint();
+            ConsolePrintTags?.Invoke(help_tags.Tags);
 
             if (NeedCloseAfterPrint)
                 Environment.Exit(1);
@@ -356,10 +422,11 @@ namespace CLI.Tag.Helper
         /// <summary> Выводит информацию по тегу если за ним стоит тег -h или --help и закрывает приложение </summary>
         /// <param name="args">аргументы</param>
         /// <param name="tag">тег</param>
-        public static void CheckHelpArgAfterTag_PrintAndClose(string[] args, string tag)
+        /// <param name="TagFilePath">путь к файлу тегов (если Null - используется PROJECT_NAME.Tags.json)</param>
+        public static void CheckHelpArgAfterTag_PrintAndClose(string[] args, string tag, string TagFilePath = null)
         {
             var index = GetTagIndex(args, tag);
-            CheckHelpArgAfterTag_PrintAndClose(args, tag, index);
+            CheckHelpArgAfterTag_PrintAndClose(args, tag, index, TagFilePath);
         }
 
         #endregion
