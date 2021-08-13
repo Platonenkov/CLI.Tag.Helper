@@ -111,18 +111,18 @@ await CLITagHelper.WriteHelpInfo("en"); //en-Us, en, En - what lang or culture N
 ### Change Default Console print
 
 ```C#
-            CLITagHelper.ConsolePrintTag = PrintTagHelp;
-            CLITagHelper.ConsolePrintTags = PrintHelp;
-            CLITagHelper.ConsolePrintArgs = PrintArguments;
-            CLITagHelper.ConsolePrintArgsMulti = PrintArguments;
+	CLITagHelper.ConsolePrintTag = PrintTagHelp;
+	CLITagHelper.ConsolePrintTags = PrintHelp;
+	CLITagHelper.ConsolePrintArgs = PrintArguments;
+	CLITagHelper.ConsolePrintArgsMulti = PrintArguments;
 ```
 where:
 ```C#
-        public static void PrintHelp(IEnumerable<Tag> tags)
-        {
-				foreach (var tag in tags)
-					...
-		}
+public static void PrintHelp(IEnumerable<Tag> tags)
+{
+	foreach (var tag in tags)
+		...
+}
 ```
 
 <div align="center" >
