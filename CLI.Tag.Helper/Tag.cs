@@ -44,8 +44,14 @@ namespace CLI.Tag.Helper
         /// <returns></returns>
         private string CommentsToString() => Comments is null ? null : string.Join("\n", Comments);
         /// <summary> Выводит информацию о теге на консоль </summary>
-        public void ConsolePrint()
+        public void ConsolePrint(Action<Tag> action = null)
         {
+            if(action is not null)
+            {
+                action.Invoke(this);
+                return;
+            }
+
             var names = FullNames.Aggregate(
                 $"{string.Empty,CLIConstants.LeftConsoleMargin}",
                 (
@@ -58,6 +64,9 @@ namespace CLI.Tag.Helper
             if (CommentsToString() is { Length: > 0 } comments)
                 comments.ConsoleYellow();
         }
+
+        public delegate void BaseConsolePrint();
+
         #endregion
 
     }
