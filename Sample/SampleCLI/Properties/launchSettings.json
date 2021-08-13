@@ -2,7 +2,7 @@
   "profiles": {
     "SampleCLI": {
       "commandName": "Project",
-      "commandLineArgs": "-l ru -output test test_1 \"test 2\" -help -s -veryverylongtext ыва ыва -i"
+      "commandLineArgs": "-l ru -h"
     }
   }
 }

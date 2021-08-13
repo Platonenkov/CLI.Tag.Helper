@@ -13,32 +13,11 @@ namespace SampleCLI
         public static CultureInfo CurrentCulture = CultureInfo.GetCultureInfo("en-Us");
         static async Task<int> Main(string[] args)
         {
-            var rows = CLITagHelper.GetArgumentsWithOneStringValues(args).ToArray();
-            if (rows.Length > 0)
-            {
-                "Arguments:".ConsoleYellow();
-                var grid = new Document(new Grid { Stroke = LineThickness.Single, StrokeColor = ConsoleColor.Green }
-                   .AddColumns(
-                        new Column { Width = GridLength.Auto },
-                        new Column { Width = GridLength.Star(1) }
-                    )
-                   .AddChildren(
-                        new Cell { Stroke = LineThickness.Single, Color = ConsoleColor.White }
-                           .AddChildren("Tag"),
-                        new Cell { Stroke = LineThickness.Single, Color = ConsoleColor.White }
-                           .AddChildren("Values"),
-                        rows.Select(
-                            r => new[]
-                            {
-                                new Cell {Stroke = LineThickness.Single, Color = ConsoleColor.Yellow, TextWrap = TextWrap.WordWrap}
-                                   .AddChildren(r.tag),
-                                new Cell {Stroke = LineThickness.Single, Color = ConsoleColor.White, TextWrap = TextWrap.WordWrap}
-                                   .AddChildren(r.parameters),
-                            })
-                    ));
-                ConsoleRenderer.RenderDocument(grid);
-            }
+            CLITagHelper.ConsolePrintTag = PrintTagHelp;
+            CLITagHelper.ConsolePrintTags = PrintHelp;
+            CLITagHelper.ConsolePrintArgs = PrintArguments;
 
+            CLITagHelper.PrintArgumentsWithValues(args);
             await CLITagHelper.CheckForHelpTag_PrintAndCloseAsync(args);
 
             foreach (var (tag, index) in CLITagHelper.GetArguments(args))
@@ -66,6 +45,246 @@ namespace SampleCLI
                 }
 
             return 1;
+        }
+        /// <summary>
+        /// Выводит на консоль информацию по тегам CLI
+        /// </summary>
+        public static void PrintHelp(IEnumerable<Tag> tags)
+        {
+            var doc = new Document(new Grid
+            {
+                Stroke = LineThickness.Double,
+                StrokeColor = ConsoleColor.Green,
+                Columns =
+                {
+                    new Column
+                    {
+                        Width = GridLength.Auto, MinWidth = 2,
+                    },
+                    new Column
+                    {
+                        Width = GridLength.Auto
+                    },
+                    new Column
+                    {
+                        Width = GridLength.Star(1)
+                    }
+                },
+                Children =
+                {
+                    new Cell
+                    {
+                        Stroke = LineThickness.Single, Color = ConsoleColor.Yellow, TextAlign = TextAlign.Center,ColumnSpan = 3,
+                        Children = {"HELP"}
+                    },
+                    new Cell
+                    {
+                        Stroke = LineThickness.Single, Color = ConsoleColor.Yellow, TextAlign = TextAlign.Center,
+                        Children = {"#"}
+                    },
+                    new Cell
+                    {
+                        Stroke = LineThickness.Single, Color = ConsoleColor.Yellow,TextAlign = TextAlign.Center,
+                        Children = {"Tag"}
+                    },
+                    new Cell
+                    {
+                        Stroke = LineThickness.Single, Color = ConsoleColor.Yellow,TextAlign = TextAlign.Center,
+                        Children = {"Description"}
+                    },
+                    tags?.Select((tag, i) => GetTagCells(tag,i))
+                }
+            });
+            ConsoleRenderer.RenderDocument(doc);
+        }
+        /// <summary>
+        /// Выводит на консоль информацию по тегам CLI
+        /// </summary>
+        public static void PrintTagHelp(Tag tag)
+        {
+            var doc = new Document(new Grid
+            {
+                Stroke = LineThickness.Double,
+                StrokeColor = ConsoleColor.Green,
+                Columns =
+                {
+                    new Column
+                    {
+                        Width = GridLength.Auto
+                    },
+                    new Column
+                    {
+                        Width = GridLength.Star(1)
+                    }
+                },
+                Children =
+                {
+                    new Cell
+                    {
+                        Stroke = LineThickness.Single, Color = ConsoleColor.Yellow,TextAlign = TextAlign.Center,
+                        Children = {"Tag"}
+                    },
+                    new Cell
+                    {
+                        Stroke = LineThickness.Single, Color = ConsoleColor.Yellow,TextAlign = TextAlign.Center,
+                        Children = {"Description"}
+                    },
+                    GetTagCells(tag)
+                }
+            });
+            ConsoleRenderer.RenderDocument(doc);
+        }
+
+        private static IEnumerable<Cell> GetTagCells(Tag tag, int index) =>
+            new[]
+            {
+                new Cell
+                {
+                    Stroke = LineThickness.Single,
+                    Color = ConsoleColor.Yellow,
+                    Margin = new Thickness(1, 0),
+                    VerticalAlign = VerticalAlign.Center,
+                    Children = { index }
+                },
+                new Cell
+                {
+                    Stroke = LineThickness.Single,
+                    Color = ConsoleColor.White,
+                    TextWrap = TextWrap.WordWrap,
+                    Margin = new Thickness(1, 0),
+                    TextAlign = TextAlign.Right,
+                    VerticalAlign = VerticalAlign.Center,
+                    Children = {string.Join("\n", tag.FullNames)}
+                },
+                new Cell
+                {
+                    Stroke = LineThickness.Single,
+                    Color = ConsoleColor.White,
+                    TextWrap = TextWrap.WordWrap,
+                    Margin = new Thickness(1, 0),
+                    VerticalAlign = VerticalAlign.Center,
+                    Children = {tag.Description}
+                },
+                tag.Comments is null
+                    ? null
+                    : new Cell
+                    {
+                        ColumnSpan = 3,
+                        Stroke = LineThickness.Single,
+                        Color = ConsoleColor.DarkYellow,
+                        TextWrap = TextWrap.WordWrap,
+                        Margin = new Thickness(1, 0),
+                        Children = {string.Join("\n", tag.Comments)}
+                    }
+
+            };
+
+        private static IEnumerable<Cell> GetTagCells(Tag tag) =>
+            new[]
+            {
+                new Cell
+                {
+                    Stroke = LineThickness.Single,
+                    Color = ConsoleColor.White,
+                    TextWrap = TextWrap.WordWrap,
+                    Margin = new Thickness(1, 0),
+                    TextAlign = TextAlign.Right,
+                    VerticalAlign = VerticalAlign.Center,
+                    Children = {string.Join("\n", tag.FullNames)}
+                },
+                new Cell
+                {
+                    Stroke = LineThickness.Single,
+                    Color = ConsoleColor.White,
+                    TextWrap = TextWrap.WordWrap,
+                    Margin = new Thickness(1, 0),
+                    VerticalAlign = VerticalAlign.Center,
+                    Children = {tag.Description}
+                },
+                tag.Comments is null
+                    ? null
+                    : new Cell
+                    {
+                        ColumnSpan = 2,
+                        Stroke = LineThickness.Single,
+                        Color = ConsoleColor.DarkYellow,
+                        TextWrap = TextWrap.WordWrap,
+                        Margin = new Thickness(1, 0),
+                        Children = {string.Join("\n", tag.Comments)}
+                    }
+
+            };
+
+        /// <summary>
+        /// Выводим список заданных аргументов и параметров к ним
+        /// </summary>
+        public static void PrintArguments(IEnumerable<(string tag, int index, string parameters)> rows)
+        {
+            var doc = new Document(new Grid
+            {
+                Stroke = LineThickness.Double,
+                StrokeColor = ConsoleColor.Green,
+                Columns =
+                {
+                    new Column
+                    {
+                        Width = GridLength.Auto, MinWidth = 2
+                    },
+                    new Column
+                    {
+                        Width = GridLength.Auto
+                    },
+                    new Column
+                    {
+                        Width = GridLength.Star(1)
+                    }
+                },
+                Children =
+                {
+                    new Cell
+                    {
+                        Stroke = LineThickness.Single, Color = ConsoleColor.Yellow, TextAlign = TextAlign.Center,ColumnSpan = 3,
+                        Children = {"Arguments"}
+                    },
+                    new Cell
+                    {
+                        Stroke = LineThickness.Single, Color = ConsoleColor.Yellow, TextAlign = TextAlign.Center,
+                        Children = {"#"}
+                    },
+                    new Cell
+                    {
+                        Stroke = LineThickness.Single, Color = ConsoleColor.Yellow,TextAlign = TextAlign.Center,
+                        Children = {"Tag"}
+                    },
+                    new Cell
+                    {
+                        Stroke = LineThickness.Single, Color = ConsoleColor.Yellow,TextAlign = TextAlign.Center,
+                        Children = {"Values"}
+                    },
+                    rows.Select((r,i) => new[]
+                    {
+                        new Cell
+                        {
+                            Stroke = LineThickness.Single, Color = ConsoleColor.Yellow,Margin = new Thickness(1,0),
+                            Children = {i}
+                        },
+                        new Cell
+                        {
+                            Stroke = LineThickness.Single, Color = ConsoleColor.White,
+                            TextWrap = TextWrap.WordWrap,
+                            Margin = new Thickness(1,0),
+                            TextAlign = TextAlign.Right,
+                            Children = {r.tag}
+                        },
+                        new Cell
+                        {
+                            Stroke = LineThickness.Single, Color = ConsoleColor.White, TextWrap = TextWrap.WordWrap,Margin = new Thickness(1,0),
+                            Children = {r.parameters}
+                        },
+                    })
+                }
+            });
+            ConsoleRenderer.RenderDocument(doc);
         }
 
     }
